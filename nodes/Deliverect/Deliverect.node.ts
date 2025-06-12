@@ -73,6 +73,29 @@ export class Deliverect implements INodeType {
 				},
 				options: [
 					{
+						name: 'Get Out-Of-Stock Products',
+						value: 'getOutOfStock',
+						action: 'Get out of stock products',
+						description: 'Get out-of-stock products for a location',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '=/channelDisabledProducts?where={"account":"{{$account}}","location":"{{$location}}"}'
+							},
+						},
+					},
+					{
+						name: 'Get Store Opening Hours',
+						value: 'getStoreOpeningHours',
+						action: 'Get store opening hours',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '=/account/{{$account}}/openingHours'
+							},
+						},
+					},
+					{
 						name: 'Get Stores',
 						value: 'getStores',
 						action: 'Get stores',
@@ -85,21 +108,9 @@ export class Deliverect implements INodeType {
 						},
 					},
 					{
-						name: 'Get Out-Of-Stock Products',
-						value: 'getOutOfStock',
-						action: 'Get out-of-stock products',
-						description: 'Get out-of-stock products for a location',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/channelDisabledProducts?where={"account":"{{$account}}","location":"{{$location}}"}'
-							},
-						},
-					},
-					{
-						name: 'Set Out-of-stock Products',
+						name: 'Set Out-Of-Stock Products',
 						value: 'setOutOfStock',
-						action: 'Set out-of-stock products',
+						action: 'Set out of stock products',
 						description: 'Set out-of-stock products for a location',
 						routing: {
 							request: {
@@ -120,18 +131,6 @@ export class Deliverect implements INodeType {
 							},
 						},
 					},
-					{
-						name: 'Get Store Opening Hours',
-						value: 'getStoreOpeningHours',
-						action: 'Get store opening hours',
-						routing: {
-							request: {
-								method: 'GET',
-								url: '=/account/{{$account}}/openingHours'
-							},
-						},
-					},
-					
 				],
 				default: 'getStores',
 			},
