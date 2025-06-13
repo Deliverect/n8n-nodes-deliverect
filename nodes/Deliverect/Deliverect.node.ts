@@ -266,7 +266,7 @@ export class Deliverect implements INodeType {
 			{
 				displayName: 'Account ID',
 				name: 'account',
-				type: 'options',
+				type: 'string',
 				required: true,
 				default: '',
 				displayOptions: {
@@ -275,7 +275,7 @@ export class Deliverect implements INodeType {
 							'posAPI', 'storeAPI'
 						],
 						operation: [
-							'getStores'
+							'getStores',
 							'productSync',
 							'getProductCategories',
 							'getStoreOpeningHours',
@@ -286,7 +286,7 @@ export class Deliverect implements INodeType {
 			{
 				displayName: 'Location ID',
 				name: 'location',
-				type: 'options',
+				type: 'string',
 				required: true,
 				default: '',
 				displayOptions: {
@@ -305,10 +305,27 @@ export class Deliverect implements INodeType {
 				},
 			},
 			{
+				displayName: 'Holidays',
+				name: 'holidays',
+				type: 'json',
+				default: `{"locations": [{"id": "65***********aa56be7b63", "holidays": []}]}`,
+				description: '',
+				displayOptions: { // the resources and operations to display this element with
+					show: {
+						resource: [
+							'storeAPI', 
+						],
+						operation: [
+							'setStoreHolidays',
+						]
+					}
+				},
+			},
+			{
 				displayName: 'Store ID',
 				description: 'The ID of the store (channelLink)',
 				name: 'channelLink',
-				type: 'options',
+				type: 'string',
 				required: true,
 				default: '',
 				displayOptions: {
@@ -323,18 +340,18 @@ export class Deliverect implements INodeType {
 				}
 			},
 			{
-				displayName: 'Holidays',
-				name: 'holidays',
+				displayName: 'Order Data',
+				name: 'orderData',
 				type: 'json',
-				default: `{"locations": [{"id": "65***********aa56be7b63", "holidays": []}]}`,
+				default: `{"posLocationId": "", "items": []}`,
 				description: '',
 				displayOptions: { // the resources and operations to display this element with
 					show: {
 						resource: [
-							'storeAPI', 
+							'channelAPI', 
 						],
 						operation: [
-							'setStoreHolidays',
+							'createOrder',
 						]
 					}
 				},
