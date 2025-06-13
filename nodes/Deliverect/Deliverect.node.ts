@@ -80,7 +80,18 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/channelDisabledProducts?where={"account":"{{$account}}","location":"{{$location}}"}'
+								url: '=/channelDisabledProducts?where={"account":"{{$parameter.account}}","location":"{{$parameter.location}}"}'
+							},
+						},
+					},
+					{
+						name: 'Get Store Holidays',
+						value: 'getStoreHolidays',
+						action: 'Get store holidays',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '=/locations/holidays',
 							},
 						},
 					},
@@ -91,7 +102,7 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/account/{{$account}}/openingHours'
+								url: '=/account/{{$parameter.account}}/openingHours'
 							},
 						},
 					},
@@ -103,7 +114,7 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '/locations',
+								url: '=/locations?where={"account":"{{$parameter.account}}"}',
 							},
 						},
 					},
@@ -115,7 +126,36 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'POST',
-								url: '/products/snoozeByPlus'
+								url: '/products/snoozeByPlus',
+								body: {
+									account: '={{$parameter.account}}',
+									location: '={{$parameter.location}}',
+									plus: '={{ $parameter.products }}',
+								}
+							},
+						},
+					},
+					{
+						name: 'Set Store Holidays',
+						value: 'setStoreHolidays',
+						action: 'Set store holidays',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '=/locations/holidays',
+								body: '={{ $parameter.holidays }}',
+							},
+						},
+					},
+					{
+						name: 'Set Store Opening Hours',
+						value: 'setStoreOpeningHours',
+						action: 'Set store opening hours',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '=/locations/openingHours',
+								body: '={{ $parameter.openingHours }}',
 							},
 						},
 					},
@@ -127,7 +167,12 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'POST',
-								url: '=/updateStoreStatus/{{$location}}'
+								url: '=/updateStoreStatus/{{$parameter.location}}',
+								body: {
+									isActive: '={{$parameter.isActive}}',
+									// channelLinks:
+									"=disableAt": '={{$parameter.disableAt !== "" && $parameter.disableAt !== undefined ? $parameter.disableAt : undefined}}',
+								}
 							},
 						},
 					},
@@ -155,7 +200,7 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'POST',
-								url: '=/deliverect/order/{{$store}}'
+								url: '=/deliverect/order/{{$parameter.channelLink}}'
 							},
 						},
 					},
@@ -187,10 +232,113 @@ export class Deliverect implements INodeType {
 							},
 						},
 					},
+					{
+						name: 'Get All Allergens',
+						value: 'getAllAllergens',
+						action: 'Get all allergens',
+						description: 'Retrieve all allergens from POSAPI',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '/allAllergens',
+							},
+						},
+					},
+					{
+						name: 'Get Product Categories',
+						value: 'getProductCategories',
+						action: 'Get product categories',
+						description: 'Retrieve product categories for a specific account from POSAPI',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '/productCategories',
+								qs: {
+									where: '={{ JSON.stringify({ account: $parameter.account }) }}',
+								},
+							},
+						},
+					},
 				],
 				default: 'productSync',
 			},
 			// Optional/additional fields will go here
+			{
+				displayName: 'Account ID',
+				name: 'account',
+				type: 'options',
+				required: true,
+				default: '',
+				displayOptions: {
+					show: {
+						resource: [
+							'posAPI', 'storeAPI'
+						],
+						operation: [
+							'getStores'
+							'productSync',
+							'getProductCategories',
+							'getStoreOpeningHours',
+						],
+					},
+				},
+			},
+			{
+				displayName: 'Location ID',
+				name: 'location',
+				type: 'options',
+				required: true,
+				default: '',
+				displayOptions: {
+					show: {
+						resource: [
+							'posAPI', 'storeAPI'
+						],
+						operation: [
+							'productSync',
+							'getOutOfStock',
+							'getProductCategories',
+							'setStoreStatus',
+							'setOutOfStock',
+						],
+					},
+				},
+			},
+			{
+				displayName: 'Store ID',
+				description: 'The ID of the store (channelLink)',
+				name: 'channelLink',
+				type: 'options',
+				required: true,
+				default: '',
+				displayOptions: {
+					show: {
+						resource: [
+							'channelAPI',
+						],
+						operation: [
+							'createOrder',
+						],
+					}
+				}
+			},
+			{
+				displayName: 'Holidays',
+				name: 'holidays',
+				type: 'json',
+				default: `{"locations": [{"id": "65***********aa56be7b63", "holidays": []}]}`,
+				description: '',
+				displayOptions: { // the resources and operations to display this element with
+					show: {
+						resource: [
+							'storeAPI', 
+						],
+						operation: [
+							'setStoreHolidays',
+						]
+					}
+				},
+			},
 		],
 	};
 	
