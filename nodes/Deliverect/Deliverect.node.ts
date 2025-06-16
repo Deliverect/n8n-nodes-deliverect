@@ -40,6 +40,10 @@ export class Deliverect implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
+						name: 'REST API',
+						value: 'restAPI',
+					},
+					{
 						name: 'Store API',
 						value: 'storeAPI',
 					},
@@ -80,7 +84,7 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/channelDisabledProducts?where={"account":"{{$parameter.account}}","location":"{{$parameter.location}}"}'
+								url: '=/channelDisabledProducts?where={"location":"{{$parameter.location}}"}'
 							},
 						},
 					},
@@ -276,6 +280,7 @@ export class Deliverect implements INodeType {
 						],
 						operation: [
 							'getStores',
+							'setOutOfStock',
 							'productSync',
 							'getProductCategories',
 							'getStoreOpeningHours',
