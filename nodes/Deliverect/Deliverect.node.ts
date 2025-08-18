@@ -1,7 +1,4 @@
-import type {
-	INodeType,
-	INodeTypeDescription,
-} from 'n8n-workflow';
+import type { INodeType, INodeTypeDescription } from 'n8n-workflow';
 import { NodeConnectionType } from 'n8n-workflow';
 
 export class Deliverect implements INodeType {
@@ -40,14 +37,6 @@ export class Deliverect implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'REST API',
-						value: 'restAPI',
-					},
-					{
-						name: 'Store API',
-						value: 'storeAPI',
-					},
-					{
 						name: 'Channel API',
 						value: 'channelAPI',
 					},
@@ -58,11 +47,19 @@ export class Deliverect implements INodeType {
 					{
 						name: 'POS API',
 						value: 'posAPI',
-					}
+					},
+					{
+						name: 'REST API',
+						value: 'restAPI',
+					},
+					{
+						name: 'Store API',
+						value: 'storeAPI',
+					},
 				],
 				default: 'storeAPI',
 			},
-		// Operations will go here
+			// Operations will go here
 			{
 				displayName: 'Operation',
 				name: 'operation',
@@ -70,9 +67,7 @@ export class Deliverect implements INodeType {
 				noDataExpression: true,
 				displayOptions: {
 					show: {
-						resource: [
-							'storeAPI',
-						],
+						resource: ['storeAPI'],
 					},
 				},
 				options: [
@@ -84,7 +79,7 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/channelDisabledProducts?where={"location":"{{$parameter.location}}"}'
+								url: '=/channelDisabledProducts?where={"location":"{{$parameter.location}}"}',
 							},
 						},
 					},
@@ -106,7 +101,7 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/account/{{$parameter.account}}/openingHours'
+								url: '=/account/{{$parameter.account}}/openingHours',
 							},
 						},
 					},
@@ -135,7 +130,7 @@ export class Deliverect implements INodeType {
 									account: '={{$parameter.account}}',
 									location: '={{$parameter.location}}',
 									plus: '={{ $parameter.products }}',
-								}
+								},
 							},
 						},
 					},
@@ -175,8 +170,9 @@ export class Deliverect implements INodeType {
 								body: {
 									isActive: '={{$parameter.isActive}}',
 									// channelLinks:
-									"=disableAt": '={{$parameter.disableAt !== "" && $parameter.disableAt !== undefined ? $parameter.disableAt : undefined}}',
-								}
+									'=disableAt':
+										'={{$parameter.disableAt !== "" && $parameter.disableAt !== undefined ? $parameter.disableAt : undefined}}',
+								},
 							},
 						},
 					},
@@ -190,9 +186,7 @@ export class Deliverect implements INodeType {
 				noDataExpression: true,
 				displayOptions: {
 					show: {
-						resource: [
-							'channelAPI',
-						],
+						resource: ['channelAPI'],
 					},
 				},
 				options: [
@@ -204,7 +198,7 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'POST',
-								url: '=/deliverect/order/{{$parameter.channelLink}}'
+								url: '=/deliverect/order/{{$parameter.channelLink}}',
 							},
 						},
 					},
@@ -218,9 +212,7 @@ export class Deliverect implements INodeType {
 				noDataExpression: true,
 				displayOptions: {
 					show: {
-						resource: [
-							'posAPI',
-						],
+						resource: ['posAPI'],
 					},
 				},
 				options: [
@@ -232,7 +224,7 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'POST',
-								url: '/productAndCategories'
+								url: '/productAndCategories',
 							},
 						},
 					},
@@ -275,9 +267,7 @@ export class Deliverect implements INodeType {
 				default: '',
 				displayOptions: {
 					show: {
-						resource: [
-							'posAPI', 'storeAPI'
-						],
+						resource: ['posAPI', 'storeAPI'],
 						operation: [
 							'getStores',
 							'setOutOfStock',
@@ -296,9 +286,7 @@ export class Deliverect implements INodeType {
 				default: '',
 				displayOptions: {
 					show: {
-						resource: [
-							'posAPI', 'storeAPI'
-						],
+						resource: ['posAPI', 'storeAPI'],
 						operation: [
 							'productSync',
 							'getOutOfStock',
@@ -314,16 +302,12 @@ export class Deliverect implements INodeType {
 				name: 'holidays',
 				type: 'json',
 				default: `{"locations": [{"id": "65***********aa56be7b63", "holidays": []}]}`,
-				description: '',
-				displayOptions: { // the resources and operations to display this element with
+				displayOptions: {
+					// the resources and operations to display this element with
 					show: {
-						resource: [
-							'storeAPI', 
-						],
-						operation: [
-							'setStoreHolidays',
-						]
-					}
+						resource: ['storeAPI'],
+						operation: ['setStoreHolidays'],
+					},
 				},
 			},
 			{
@@ -335,33 +319,24 @@ export class Deliverect implements INodeType {
 				default: '',
 				displayOptions: {
 					show: {
-						resource: [
-							'channelAPI',
-						],
-						operation: [
-							'createOrder',
-						],
-					}
-				}
+						resource: ['channelAPI'],
+						operation: ['createOrder'],
+					},
+				},
 			},
 			{
 				displayName: 'Order Data',
 				name: 'orderData',
 				type: 'json',
 				default: `{"posLocationId": "", "items": []}`,
-				description: '',
-				displayOptions: { // the resources and operations to display this element with
+				displayOptions: {
+					// the resources and operations to display this element with
 					show: {
-						resource: [
-							'channelAPI', 
-						],
-						operation: [
-							'createOrder',
-						]
-					}
+						resource: ['channelAPI'],
+						operation: ['createOrder'],
+					},
 				},
 			},
 		],
 	};
-	
 }
