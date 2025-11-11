@@ -33,7 +33,7 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/DeliverectApi.credentials.ts"
+      "dist/credentials/DeliverectApi.credentials.js"
     ],
     "nodes": [
       "dist/nodes/Deliverect/Delivect.node.js"
