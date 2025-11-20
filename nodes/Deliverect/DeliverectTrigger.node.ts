@@ -9,15 +9,15 @@ import { createHmac, timingSafeEqual } from 'crypto';
 
 export class DeliverectTrigger implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Deliverect Order Trigger',
+		displayName: 'Deliverect Order Webhook',
 		name: 'deliverectTrigger',
 		icon: 'file:deliverect.svg',
 		group: ['trigger'],
 		version: 1,
 		description:
-			'Triggers the workflow when order data is received from Deliverect (New Order, Status Update, or Courier Update)',
+			'Triggers the workflow when order events are received from Deliverect. Handles new orders, order status updates, and courier/delivery updates.',
 		defaults: {
-			name: 'Deliverect Order Trigger',
+			name: 'Deliverect Order Webhook',
 		},
 		inputs: [],
 		outputs: ['main'],
@@ -37,7 +37,7 @@ export class DeliverectTrigger implements INodeType {
 				default: 'deliverect-order',
 				placeholder: 'deliverect-order',
 				description:
-					'The path to listen for incoming order webhooks. Provide this URL to Deliverect API support team along with your account details.',
+					'The path to listen for incoming order webhooks from Deliverect. This will receive new orders, status updates, and courier updates. Provide the full webhook URL to Deliverect API support team along with your account details.',
 				required: true,
 			},
 			{
@@ -107,14 +107,32 @@ export class DeliverectTrigger implements INodeType {
 				throw new Error('Missing HMAC signature in webhook request');
 			}
 
-			// Calculate HMAC signature from request body
-			const rawBody = JSON.stringify(body);
+			// Calculate HMAC signature from raw request body
+			// Use rawBody if available (preserves exact formatting from Deliverect)
+			// The raw body is needed because JSON.stringify() may produce different formatting
+			// (key ordering, whitespace) than the original payload signed by Deliverect
+			// Check multiple possible locations where n8n might store the raw body
+			const reqWithRawBody = req as IDataObject & { rawBody?: string | Buffer };
+			const rawBody = reqWithRawBody.rawBody;
+			
+			if (!rawBody) {
+				throw new Error(
+					'Raw request body not available for HMAC verification. ' +
+					'The webhook must preserve the raw request body. ' +
+					'In n8n, ensure the webhook node is configured to capture raw body data.'
+				);
+			}
+
+			// Convert rawBody to string if it's a Buffer
+			const rawBodyString = typeof rawBody === 'string' ? rawBody : rawBody.toString('utf8');
+			
 			const calculatedSignature = createHmac('sha256', webhookSecret)
-				.update(rawBody)
+				.update(rawBodyString)
 				.digest('hex');
 
 			// Compare signatures (constant-time comparison to prevent timing attacks)
-			const signatureBuffer = Buffer.from(signature as string, 'utf8');
+			// Both signatures are in hex format, so decode the incoming signature as hex
+			const signatureBuffer = Buffer.from(signature as string, 'hex');
 			const calculatedBuffer = Buffer.from(calculatedSignature, 'hex');
 			
 			if (signatureBuffer.length !== calculatedBuffer.length) {
@@ -127,6 +145,10 @@ export class DeliverectTrigger implements INodeType {
 		}
 
 		// Determine webhook event type based on payload structure
+		// Deliverect sends three types of webhook events:
+		// 1. New Order: Full order object with _id and items array
+		// 2. Status Update: Order status change with orderId, status, and timeStamp
+		// 3. Courier Update: Delivery/courier status change with orderId and courier object
 		let eventType = 'unknown';
 		if (body._id && body.items) {
 			eventType = 'newOrder';
