@@ -1,0 +1,155 @@
+import type {
+	INodeType,
+	INodeTypeDescription,
+	IWebhookFunctions,
+	IWebhookResponseData,
+	IDataObject,
+} from 'n8n-workflow';
+import { createHmac, timingSafeEqual } from 'crypto';
+
+export class DeliverectTrigger implements INodeType {
+	description: INodeTypeDescription = {
+		displayName: 'Deliverect Order Trigger',
+		name: 'deliverectTrigger',
+		icon: 'file:deliverect.svg',
+		group: ['trigger'],
+		version: 1,
+		description:
+			'Triggers the workflow when order data is received from Deliverect (New Order, Status Update, or Courier Update)',
+		defaults: {
+			name: 'Deliverect Order Trigger',
+		},
+		inputs: [],
+		outputs: ['main'],
+		webhooks: [
+			{
+				name: 'default',
+				httpMethod: 'POST',
+				responseMode: '={{$parameter["responseMode"]}}',
+				path: '={{$parameter["path"]}}',
+			},
+		],
+		properties: [
+			{
+				displayName: 'Path',
+				name: 'path',
+				type: 'string',
+				default: 'deliverect-order',
+				placeholder: 'deliverect-order',
+				description:
+					'The path to listen for incoming order webhooks. Provide this URL to Deliverect API support team along with your account details.',
+				required: true,
+			},
+			{
+				displayName: 'Response Mode',
+				name: 'responseMode',
+				type: 'options',
+				options: [
+					{
+						name: 'Respond When Last Node Finishes',
+						value: 'lastNode',
+					},
+					{
+						name: 'Respond Immediately',
+						value: 'responseNode',
+					},
+				],
+				default: 'responseNode',
+				description: 'When to respond to the webhook',
+			},
+			{
+				displayName: 'Verify HMAC Signature',
+				name: 'verifyHMAC',
+				type: 'boolean',
+				default: false,
+				description:
+					'Whether to verify the HMAC signature from Deliverect webhooks for security. Requires webhook secret.',
+			},
+			{
+				displayName: 'Webhook Secret',
+				name: 'webhookSecret',
+				type: 'string',
+				typeOptions: {
+					password: true,
+				},
+				default: '',
+				description:
+					'The webhook secret provided by Deliverect for HMAC signature verification. Required if HMAC verification is enabled.',
+				displayOptions: {
+					show: {
+						verifyHMAC: [true],
+					},
+				},
+			},
+		],
+	};
+
+	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
+		const req = this.getRequestObject();
+		const body = req.body as IDataObject;
+		const headers = req.headers;
+
+		// Validate that we received data
+		if (!body) {
+			throw new Error('No data received in webhook request');
+		}
+
+		// Verify HMAC signature if enabled
+		const verifyHMAC = this.getNodeParameter('verifyHMAC', false) as boolean;
+		if (verifyHMAC) {
+			const webhookSecret = this.getNodeParameter('webhookSecret', '') as string;
+			if (!webhookSecret) {
+				throw new Error('Webhook secret is required when HMAC verification is enabled');
+			}
+
+			const signature = headers['x-deliverect-signature'] || headers['X-Deliverect-Signature'];
+			if (!signature) {
+				throw new Error('Missing HMAC signature in webhook request');
+			}
+
+			// Calculate HMAC signature from request body
+			const rawBody = JSON.stringify(body);
+			const calculatedSignature = createHmac('sha256', webhookSecret)
+				.update(rawBody)
+				.digest('hex');
+
+			// Compare signatures (constant-time comparison to prevent timing attacks)
+			const signatureBuffer = Buffer.from(signature as string, 'utf8');
+			const calculatedBuffer = Buffer.from(calculatedSignature, 'hex');
+			
+			if (signatureBuffer.length !== calculatedBuffer.length) {
+				throw new Error('Invalid HMAC signature - webhook may not be from Deliverect');
+			}
+			
+			if (!timingSafeEqual(signatureBuffer, calculatedBuffer)) {
+				throw new Error('Invalid HMAC signature - webhook may not be from Deliverect');
+			}
+		}
+
+		// Determine webhook event type based on payload structure
+		let eventType = 'unknown';
+		if (body._id && body.items) {
+			eventType = 'newOrder';
+		} else if (body.orderId && body.status !== undefined && body.timeStamp) {
+			eventType = 'statusUpdate';
+		} else if (body.orderId && body.courier) {
+			eventType = 'courierUpdate';
+		}
+
+		// Return the order data to be processed by the workflow
+		return {
+			workflowData: [
+				[
+					{
+						json: {
+							...body,
+							_eventType: eventType,
+							_receivedAt: new Date().toISOString(),
+						},
+					},
+				],
+			],
+		};
+	}
+}
+

@@ -1,0 +1,19 @@
+{
+	"node": "n8n-nodes-base.DeliverectTrigger",
+	"nodeVersion": "0.1.0",
+	"codexVersion": "1.0",
+	"categories": ["Productivity"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": ""
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": ""
+			}
+		]
+	}
+}
+
