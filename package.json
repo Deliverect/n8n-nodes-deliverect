@@ -36,7 +36,7 @@
       "dist/credentials/DeliverectApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Deliverect/Delivect.node.js"
+      "dist/nodes/Deliverect/Deliverect.node.js"
     ]
   },
   "devDependencies": {
