@@ -21,6 +21,12 @@ export class DeliverectTrigger implements INodeType {
 		},
 		inputs: [],
 		outputs: ['main'],
+		credentials: [
+			{
+				name: 'deliverectApi',
+				required: true,
+			},
+		],
 		webhooks: [
 			{
 				name: 'default',
@@ -57,30 +63,6 @@ export class DeliverectTrigger implements INodeType {
 				default: 'responseNode',
 				description: 'When to respond to the webhook',
 			},
-			{
-				displayName: 'Verify HMAC Signature',
-				name: 'verifyHMAC',
-				type: 'boolean',
-				default: false,
-				description:
-					'Whether to verify the HMAC signature from Deliverect webhooks for security. Requires webhook secret.',
-			},
-			{
-				displayName: 'Webhook Secret',
-				name: 'webhookSecret',
-				type: 'string',
-				typeOptions: {
-					password: true,
-				},
-				default: '',
-				description:
-					'The webhook secret provided by Deliverect for HMAC signature verification. Required if HMAC verification is enabled.',
-				displayOptions: {
-					show: {
-						verifyHMAC: [true],
-					},
-				},
-			},
 		],
 	};
 
@@ -94,54 +76,52 @@ export class DeliverectTrigger implements INodeType {
 			throw new Error('No data received in webhook request');
 		}
 
-		// Verify HMAC signature if enabled
-		const verifyHMAC = this.getNodeParameter('verifyHMAC', false) as boolean;
-		if (verifyHMAC) {
-			const webhookSecret = this.getNodeParameter('webhookSecret', '') as string;
-			if (!webhookSecret) {
-				throw new Error('Webhook secret is required when HMAC verification is enabled');
-			}
+		// Verify HMAC signature (always required for security)
+		const credentials = await this.getCredentials('deliverectApi');
+		const webhookSecret = credentials.webhookSecret as string;
+		if (!webhookSecret) {
+			throw new Error('Webhook secret is required for HMAC verification. Please configure it in your Deliverect API credentials.');
+		}
 
-			const signature = headers['x-deliverect-signature'] || headers['X-Deliverect-Signature'];
-			if (!signature) {
-				throw new Error('Missing HMAC signature in webhook request');
-			}
+		const signature = headers['x-deliverect-signature'] || headers['X-Deliverect-Signature'];
+		if (!signature) {
+			throw new Error('Missing HMAC signature in webhook request');
+		}
 
-			// Calculate HMAC signature from raw request body
-			// Use rawBody if available (preserves exact formatting from Deliverect)
-			// The raw body is needed because JSON.stringify() may produce different formatting
-			// (key ordering, whitespace) than the original payload signed by Deliverect
-			// Check multiple possible locations where n8n might store the raw body
-			const reqWithRawBody = req as IDataObject & { rawBody?: string | Buffer };
-			const rawBody = reqWithRawBody.rawBody;
-			
-			if (!rawBody) {
-				throw new Error(
-					'Raw request body not available for HMAC verification. ' +
-					'The webhook must preserve the raw request body. ' +
-					'In n8n, ensure the webhook node is configured to capture raw body data.'
-				);
-			}
+		// Calculate HMAC signature from raw request body
+		// Use rawBody if available (preserves exact formatting from Deliverect)
+		// The raw body is needed because JSON.stringify() may produce different formatting
+		// (key ordering, whitespace) than the original payload signed by Deliverect
+		// Check multiple possible locations where n8n might store the raw body
+		const reqWithRawBody = req as IDataObject & { rawBody?: string | Buffer };
+		const rawBody = reqWithRawBody.rawBody;
+		
+		if (!rawBody) {
+			throw new Error(
+				'Raw request body not available for HMAC verification. ' +
+				'The webhook must preserve the raw request body. ' +
+				'In n8n, ensure the webhook node is configured to capture raw body data.'
+			);
+		}
 
-			// Convert rawBody to string if it's a Buffer
-			const rawBodyString = typeof rawBody === 'string' ? rawBody : rawBody.toString('utf8');
-			
-			const calculatedSignature = createHmac('sha256', webhookSecret)
-				.update(rawBodyString)
-				.digest('hex');
+		// Convert rawBody to string if it's a Buffer
+		const rawBodyString = typeof rawBody === 'string' ? rawBody : rawBody.toString('utf8');
+		
+		const calculatedSignature = createHmac('sha256', webhookSecret)
+			.update(rawBodyString)
+			.digest('hex');
 
-			// Compare signatures (constant-time comparison to prevent timing attacks)
-			// Both signatures are in hex format, so decode the incoming signature as hex
-			const signatureBuffer = Buffer.from(signature as string, 'hex');
-			const calculatedBuffer = Buffer.from(calculatedSignature, 'hex');
-			
-			if (signatureBuffer.length !== calculatedBuffer.length) {
-				throw new Error('Invalid HMAC signature - webhook may not be from Deliverect');
-			}
-			
-			if (!timingSafeEqual(signatureBuffer, calculatedBuffer)) {
-				throw new Error('Invalid HMAC signature - webhook may not be from Deliverect');
-			}
+		// Compare signatures (constant-time comparison to prevent timing attacks)
+		// Both signatures are in hex format, so decode the incoming signature as hex
+		const signatureBuffer = Buffer.from(signature as string, 'hex');
+		const calculatedBuffer = Buffer.from(calculatedSignature, 'hex');
+		
+		if (signatureBuffer.length !== calculatedBuffer.length) {
+			throw new Error('Invalid HMAC signature - webhook may not be from Deliverect');
+		}
+		
+		if (!timingSafeEqual(signatureBuffer, calculatedBuffer)) {
+			throw new Error('Invalid HMAC signature - webhook may not be from Deliverect');
 		}
 
 		// Determine webhook event type based on payload structure

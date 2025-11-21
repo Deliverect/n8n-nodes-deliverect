@@ -28,17 +28,21 @@ export class DeliverectApi implements ICredentialType {
 			default: '',
 		},
 		{
-			displayName: 'Client ID',
+			displayName: 'Client ID (M2M)',
 			name: 'clientId',
 			type: 'string',
 			default: '',
+			description:
+				'The client ID for machine-to-machine (M2M) authentication. Used together with the Client Secret to obtain access tokens.',
 		},
 		{
-			displayName: 'Client Secret',
+			displayName: 'Client Secret (M2M)',
 			name: 'clientSecret',
 			type: 'string',
 			typeOptions: { password: true },
 			default: '',
+			description:
+				'The client secret for machine-to-machine (M2M) authentication. Used to obtain access tokens via OAuth client credentials flow.',
 		},
 		{
 			displayName: 'Domain',
@@ -63,6 +67,17 @@ export class DeliverectApi implements ICredentialType {
 					value: 'api.staging.deliverect.io',
 				},
 			],
+		},
+		{
+			displayName: 'Webhook Secret',
+			name: 'webhookSecret',
+			type: 'string',
+			typeOptions: {
+				password: true,
+			},
+			default: '',
+			description:
+				'The webhook secret provided by Deliverect for HMAC signature verification of incoming webhooks. This is different from the Client Secret used for M2M authentication. Required for webhook security.',
 		},
 	];
 
