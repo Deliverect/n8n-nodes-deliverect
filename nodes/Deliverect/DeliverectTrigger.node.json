@@ -2,18 +2,19 @@
 	"node": "n8n-nodes-base.DeliverectTrigger",
 	"nodeVersion": "0.1.0",
 	"codexVersion": "1.0",
-	"categories": ["Productivity"],
+	"categories": [
+		"Productivity"
+	],
 	"resources": {
 		"credentialDocumentation": [
 			{
-				"url": ""
+				"url": "https://developers.deliverect.com/reference/hmac-authentication"
 			}
 		],
 		"primaryDocumentation": [
 			{
-				"url": ""
+				"url": "https://developers.deliverect.com/reference/reporting-webhooks"
 			}
 		]
 	}
 }
-
