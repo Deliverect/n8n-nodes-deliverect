@@ -9,7 +9,7 @@ import { createHmac, timingSafeEqual } from 'crypto';
 
 export class DeliverectTrigger implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Deliverect Order Webhook',
+		displayName: 'Deliverect Order Webhook Trigger',
 		name: 'deliverectTrigger',
 		icon: 'file:deliverect.svg',
 		group: ['trigger'],
