@@ -5,6 +5,7 @@ import type {
 	IWebhookResponseData,
 	IDataObject,
 } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { createHmac, timingSafeEqual } from 'crypto';
 
 export class DeliverectTrigger implements INodeType {
@@ -73,19 +74,19 @@ export class DeliverectTrigger implements INodeType {
 
 		// Validate that we received data
 		if (!body) {
-			throw new Error('No data received in webhook request');
+			throw new NodeOperationError(this.getNode(), 'No data received in webhook request');
 		}
 
 		// Verify HMAC signature (always required for security)
 		const credentials = await this.getCredentials('deliverectApi');
 		const webhookSecret = credentials.webhookSecret as string;
 		if (!webhookSecret) {
-			throw new Error('Webhook secret is required for HMAC verification. Please configure it in your Deliverect API credentials.');
+			throw new NodeOperationError(this.getNode(), 'Webhook secret is required for HMAC verification. Please configure it in your Deliverect API credentials.');
 		}
 
 		const signature = headers['x-deliverect-signature'] || headers['X-Deliverect-Signature'];
 		if (!signature) {
-			throw new Error('Missing HMAC signature in webhook request');
+			throw new NodeOperationError(this.getNode(), 'Missing HMAC signature in webhook request');
 		}
 
 		// Calculate HMAC signature from raw request body
@@ -97,7 +98,8 @@ export class DeliverectTrigger implements INodeType {
 		const rawBody = reqWithRawBody.rawBody;
 		
 		if (!rawBody) {
-			throw new Error(
+			throw new NodeOperationError(
+				this.getNode(),
 				'Raw request body not available for HMAC verification. ' +
 				'The webhook must preserve the raw request body. ' +
 				'In n8n, ensure the webhook node is configured to capture raw body data.'
@@ -117,11 +119,11 @@ export class DeliverectTrigger implements INodeType {
 		const calculatedBuffer = Buffer.from(calculatedSignature, 'hex');
 		
 		if (signatureBuffer.length !== calculatedBuffer.length) {
-			throw new Error('Invalid HMAC signature - webhook may not be from Deliverect');
+			throw new NodeOperationError(this.getNode(), 'Invalid HMAC signature - webhook may not be from Deliverect');
 		}
 		
 		if (!timingSafeEqual(signatureBuffer, calculatedBuffer)) {
-			throw new Error('Invalid HMAC signature - webhook may not be from Deliverect');
+			throw new NodeOperationError(this.getNode(), 'Invalid HMAC signature - webhook may not be from Deliverect');
 		}
 
 		// Determine webhook event type based on payload structure
