@@ -19,19 +19,29 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Operations
 
-Store API: 
+**Store API**
 
-* get stores
-* get snoozed products
-* set snoozed products
+- Get stores, opening hours, and holidays
+- Set store opening hours/holidays
+- Set store status or busy mode (with optional prep-time updates)
+- Request product syncs
+- Get or update snoozed/out-of-stock products by PLU or tag
 
-POSAPI
+**POS API**
 
-* sync products
+- Sync products
+- Get all allergens
+- Get product categories
 
-Channel API
+**Commerce API**
 
-* publish menu
+- List commerce stores, single store details, root menus, and store menus
+- Create, patch, retrieve, and checkout baskets
+- Retrieve checkouts
+
+**Channel API**
+
+- Create orders (channel push)
 
 ## Credentials
 
@@ -51,6 +61,12 @@ If you're new with N8N, [try it out](https://docs.n8n.io/try-it-out/) first.
 
 * [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
 * [Deliverect API documentation](https://developers.deliverect.com)
+
+## Maintainer Notes
+
+- Each API resource definition lives in `nodes/Deliverect/resources/<resource>.ts`. These files bundle the operation list plus any fields scoped to that resource. Update the relevant file instead of editing the main node.
+- Shared request defaults and helpers (such as automatic \"(Internal)\" labelling for advanced operations) live in `nodes/Deliverect/helpers.ts`.
+- To add a new internal-only action, set `internal: true` on the corresponding option; the helper will add a warning suffix and description so the UI clearly distinguishes it.
 
 ## Version history
 
