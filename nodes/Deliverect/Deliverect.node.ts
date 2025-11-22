@@ -1,4 +1,4 @@
-import type { INodeType, INodeTypeDescription } from 'n8n-workflow';
+import type { INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow';
 
 export class Deliverect implements INodeType {
 	description: INodeTypeDescription = {
@@ -12,8 +12,8 @@ export class Deliverect implements INodeType {
 		defaults: {
 			name: 'Deliverect',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: ['main'] as NodeConnectionType[],
+		outputs: ['main'] as NodeConnectionType[],
 		credentials: [
 			{
 				name: 'deliverectApi',
