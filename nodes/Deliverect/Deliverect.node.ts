@@ -123,7 +123,11 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/channelDisabledProducts?where={"location":"{{$parameter.location}}"}',
+								url: '=/channelDisabledProducts',
+								qs: {
+									where: '={{ JSON.stringify({ location: $parameter.location }) }}',
+									projection: '={{ JSON.stringify({ _id: 1, location: 1, channelLink: 1, plus: 1, channel: 1, disabledUntil: 1, createdAt: 1, updatedAt: 1 }) }}',
+								},
 							},
 						},
 					},
@@ -243,7 +247,11 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/location/{{$parameter.location}}/holidays',
+										url: '=/locations/holidays',
+										qs: {
+											where: '={{ JSON.stringify({ location: $parameter.location }) }}',
+											projection: '={{ JSON.stringify({ id: 1, name: 1, holidays: 1, timezone: 1 }) }}',
+										},
 							},
 						},
 					},
@@ -255,6 +263,9 @@ export class Deliverect implements INodeType {
 							request: {
 								method: 'GET',
 								url: '=/account/{{$parameter.account}}/openingHours',
+								qs: {
+									projection: '={{ JSON.stringify({ account: 1, location: 1, timezone: 1, days: 1, openingHours: 1 }) }}',
+								},
 							},
 						},
 					},
@@ -266,7 +277,11 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/locations?where={"account":"{{$parameter.account}}"}',
+								url: '=/locations',
+								qs: {
+									where: '={{ JSON.stringify({ account: $parameter.account }) }}',
+									projection: '={{ JSON.stringify({ _id: 1, account: 1, name: 1, posLocationId: 1, address: 1, channelLinks: 1, timezone: 1, isActive: 1 }) }}',
+								},
 							},
 						},
 					},
@@ -418,6 +433,9 @@ return result.length ? result : undefined;`,
 							request: {
 								method: 'GET',
 								url: '/allAllergens',
+								qs: {
+									projection: '={{ JSON.stringify({ _id: 1, name: 1, tags: 1, updatedAt: 1 }) }}',
+								},
 							},
 						},
 					},
@@ -432,6 +450,7 @@ return result.length ? result : undefined;`,
 								url: '/productCategories',
 								qs: {
 									where: '={{ JSON.stringify({ account: $parameter.account }) }}',
+									projection: '={{ JSON.stringify({ _id: 1, name: 1, parent: 1, account: 1, products: { _id: 1, name: 1 } }) }}',
 								},
 							},
 						},
