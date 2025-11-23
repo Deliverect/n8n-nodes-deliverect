@@ -1,9 +1,11 @@
 import {
 	createOperationsProperty,
+	jsonExpression,
+	jsonProjection,
 	type DeliverectOperationOption,
 	type DeliverectResourceModule,
 } from '../helpers';
-import { accountField, locationField } from './sharedFields';
+import { buildAccountField, buildLocationField } from './sharedFields';
 
 const posOperationOptions: DeliverectOperationOption[] = [
 	{
@@ -11,6 +13,8 @@ const posOperationOptions: DeliverectOperationOption[] = [
 		value: 'productSync',
 		action: 'Sync POS products',
 		description: 'Sync products for a location',
+		needsAccount: true,
+		needsLocation: true,
 		routing: {
 			request: {
 				method: 'POST',
@@ -28,7 +32,7 @@ const posOperationOptions: DeliverectOperationOption[] = [
 				method: 'GET',
 				url: '/allAllergens',
 				qs: {
-					projection: '={{ JSON.stringify({ _id: 1, name: 1, tags: 1, updatedAt: 1 }) }}',
+					projection: jsonProjection(['_id', 'name', 'tags', 'updatedAt']),
 				},
 			},
 		},
@@ -38,23 +42,34 @@ const posOperationOptions: DeliverectOperationOption[] = [
 		value: 'getProductCategories',
 		action: 'Get product categories',
 		description: 'Retrieve product categories for a specific account from POSAPI',
+		needsAccount: true,
+		needsLocation: true,
 		routing: {
 			request: {
 				method: 'GET',
 				url: '/productCategories',
 				qs: {
-					where: '={{ JSON.stringify({ account: $parameter.account }) }}',
-					projection:
-						'={{ JSON.stringify({ _id: 1, name: 1, parent: 1, account: 1, "products._id": 1, "products.name": 1 }) }}',
+					where: jsonExpression('{ account: $parameter.account }'),
+					projection: jsonProjection([
+						'_id',
+						'name',
+						'parent',
+						'account',
+						'products._id',
+						'products.name',
+					]),
 				},
 			},
 		},
 	},
 ];
 
+const posAccountField = buildAccountField('posAPI', posOperationOptions);
+const posLocationField = buildLocationField('posAPI', posOperationOptions);
+
 export const posResource: DeliverectResourceModule = {
 	resource: 'posAPI',
 	operations: createOperationsProperty('posAPI', posOperationOptions, 'productSync'),
-	fields: [accountField, locationField],
+	fields: [posAccountField, posLocationField],
 };
 

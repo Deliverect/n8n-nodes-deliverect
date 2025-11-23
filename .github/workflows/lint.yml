@@ -1,4 +1,4 @@
-name: Lint
+name: CI
 
 on:
   push:
@@ -7,21 +7,34 @@ on:
     branches: [master]
 
 jobs:
-  lint:
+  build-and-lint:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["20", "22", "24"]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: "24"
-          cache: "npm"
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Cache TypeScript build info
+        uses: actions/cache@v4
+        with:
+          path: |
+            tsconfig.tsbuildinfo
+          key: ${{ runner.os }}-tsbuild-${{ matrix.node-version }}-${{ hashFiles('tsconfig.json', 'nodes/**/*.ts', 'credentials/**/*.ts') }}
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run linting
-        run: npm run lint
+      - name: Run lint (CI mode)
+        run: npm run lint:ci
+
+      - name: Build package
+        run: npm run build

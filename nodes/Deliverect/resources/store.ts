@@ -1,10 +1,12 @@
 import type { INodeProperties } from 'n8n-workflow';
 import {
 	createOperationsProperty,
+	jsonExpression,
+	jsonProjection,
 	type DeliverectOperationOption,
 	type DeliverectResourceModule,
 } from '../helpers';
-import { accountField, locationField } from './sharedFields';
+import { buildAccountField, buildLocationField } from './sharedFields';
 
 const storeOperationOptions: DeliverectOperationOption[] = [
 	{
@@ -12,14 +14,23 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 		value: 'getOutOfStock',
 		action: 'Get out of stock products',
 		description: 'Get out-of-stock products for a location',
+		needsLocation: true,
 		routing: {
 			request: {
 				method: 'GET',
 				url: '=/channelDisabledProducts',
 				qs: {
-					where: '={{ JSON.stringify({ location: $parameter.location }) }}',
-					projection:
-						'={{ JSON.stringify({ _id: 1, location: 1, channelLink: 1, plus: 1, channel: 1, disabledUntil: 1, createdAt: 1, updatedAt: 1 }) }}',
+					where: jsonExpression('{ location: $parameter.location }'),
+					projection: jsonProjection([
+						'_id',
+						'location',
+						'channelLink',
+						'plus',
+						'channel',
+						'disabledUntil',
+						'createdAt',
+						'updatedAt',
+					]),
 				},
 			},
 		},
@@ -29,15 +40,24 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 		value: 'getProductsMarkedOutOfStock',
 		action: 'Get products marked out of stock',
 		description: 'Retrieve products currently snoozed for an account (optionally by location)',
+		needsAccount: true,
 		routing: {
 			request: {
 				method: 'GET',
 				url: '=/products/markedOutOfStock',
 				qs: {
-					where:
-						'={{ JSON.stringify($parameter.locationOptional !== "" ? { account: $parameter.account, location: $parameter.locationOptional } : { account: $parameter.account }) }}',
-					projection:
-						'={{ JSON.stringify({ _id: 1, account: 1, location: 1, plus: 1, snoozeStart: 1, snoozeEnd: 1, createdAt: 1 }) }}',
+					where: jsonExpression(
+						`$parameter.locationOptional !== "" ? { account: $parameter.account, location: $parameter.locationOptional } : { account: $parameter.account }`,
+					),
+					projection: jsonProjection([
+						'_id',
+						'account',
+						'location',
+						'plus',
+						'snoozeStart',
+						'snoozeEnd',
+						'createdAt',
+					]),
 				},
 			},
 		},
@@ -51,7 +71,7 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 				method: 'GET',
 				url: '=/locations/holidays',
 				qs: {
-					projection: '={{ JSON.stringify({ id: 1, name: 1, holidays: 1, timezone: 1 }) }}',
+					projection: jsonProjection(['id', 'name', 'holidays', 'timezone']),
 				},
 			},
 		},
@@ -60,13 +80,19 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 		name: 'Get Store Opening Hours',
 		value: 'getStoreOpeningHours',
 		action: 'Get store opening hours',
+		needsAccount: true,
 		routing: {
 			request: {
 				method: 'GET',
 				url: '=/account/{{$parameter.account}}/openingHours',
 				qs: {
-					projection:
-						'={{ JSON.stringify({ account: 1, location: 1, timezone: 1, days: 1, openingHours: 1 }) }}',
+					projection: jsonProjection([
+						'account',
+						'location',
+						'timezone',
+						'days',
+						'openingHours',
+					]),
 				},
 			},
 		},
@@ -76,14 +102,23 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 		value: 'getStores',
 		action: 'Get stores',
 		description: 'Get stores for an account',
+		needsAccount: true,
 		routing: {
 			request: {
 				method: 'GET',
 				url: '=/locations',
 				qs: {
-					where: '={{ JSON.stringify({ account: $parameter.account }) }}',
-					projection:
-						'={{ JSON.stringify({ _id: 1, account: 1, name: 1, posLocationId: 1, address: 1, channelLinks: 1, timezone: 1, isActive: 1 }) }}',
+					where: jsonExpression('{ account: $parameter.account }'),
+					projection: jsonProjection([
+						'_id',
+						'account',
+						'name',
+						'posLocationId',
+						'address',
+						'channelLinks',
+						'timezone',
+						'isActive',
+					]),
 				},
 			},
 		},
@@ -93,6 +128,8 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 		value: 'markProductsOutOfStockByTag',
 		action: 'Mark products out of stock by tag',
 		description: 'Snooze tagged products for a time window',
+		needsAccount: true,
+		needsLocation: true,
 		routing: {
 			request: {
 				method: 'POST',
@@ -112,6 +149,8 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 		value: 'requestProductSync',
 		action: 'Request product sync',
 		description: 'Trigger a product sync for a location',
+		needsAccount: true,
+		needsLocation: true,
 		routing: {
 			request: {
 				method: 'POST',
@@ -129,6 +168,8 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 		value: 'setOutOfStock',
 		action: 'Set out of stock products',
 		description: 'Set out-of-stock products for a location',
+		needsAccount: true,
+		needsLocation: true,
 		routing: {
 			request: {
 				method: 'POST',
@@ -170,6 +211,7 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 		value: 'setStoreStatus',
 		action: 'Set store status',
 		description: 'Set store status for a location',
+		needsLocation: true,
 		routing: {
 			request: {
 				method: 'POST',
@@ -188,6 +230,8 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 		value: 'updateProductAvailabilityByPlu',
 		action: 'Update product availability by PLU',
 		description: 'Snooze or unsnooze products for a time window using PLUs',
+		needsAccount: true,
+		needsLocation: true,
 		routing: {
 			request: {
 				method: 'POST',
@@ -207,6 +251,7 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 		value: 'updateStoreStatusPrepTime',
 		action: 'Update store status and prep time',
 		description: 'Set busy mode and preparation time (optionally per channel link)',
+		needsLocation: true,
 		routing: {
 			request: {
 				method: 'POST',
@@ -222,6 +267,9 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 		},
 	},
 ];
+
+const storeAccountField = buildAccountField('storeAPI', storeOperationOptions);
+const storeLocationField = buildLocationField('storeAPI', storeOperationOptions);
 
 const storeSpecificFields: INodeProperties[] = [
 	{
@@ -389,6 +437,6 @@ const storeSpecificFields: INodeProperties[] = [
 export const storeResource: DeliverectResourceModule = {
 	resource: 'storeAPI',
 	operations: createOperationsProperty('storeAPI', storeOperationOptions, 'getStores'),
-	fields: [accountField, locationField, ...storeSpecificFields],
+	fields: [storeAccountField, storeLocationField, ...storeSpecificFields],
 };
 

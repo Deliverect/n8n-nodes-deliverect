@@ -6,7 +6,8 @@ export type DeliverectResourceName =
 	| 'kdsAPI'
 	| 'posAPI'
 	| 'restAPI'
-	| 'storeAPI';
+	| 'storeAPI'
+	| 'userAPI';
 
 export interface DeliverectResourceModule {
 	resource: DeliverectResourceName;
@@ -16,6 +17,8 @@ export interface DeliverectResourceModule {
 
 export interface DeliverectOperationOption extends INodePropertyOptions {
 	internal?: boolean;
+	needsAccount?: boolean;
+	needsLocation?: boolean;
 }
 
 export const deliverectRequestDefaults: IDataObject = {
@@ -81,3 +84,19 @@ export const flattenResourceModules = (modules: DeliverectResourceModule[]): INo
 
 		return chunks;
 	});
+
+const ensureWrappedExpression = (expression: string): string => {
+	const trimmed = expression.trim();
+	if (trimmed.startsWith('(') && trimmed.endsWith(')')) {
+		return trimmed;
+	}
+	return `(${expression})`;
+};
+
+export const jsonExpression = (expression: string): string =>
+	`={{ JSON.stringify${ensureWrappedExpression(expression)} }}`;
+
+export const jsonProjection = (fields: string[]): string => {
+	const projection = Object.fromEntries(fields.map((field) => [field, 1]));
+	return `={{ JSON.stringify(${JSON.stringify(projection)}) }}`;
+};

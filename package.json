@@ -18,15 +18,16 @@
   "engines": {
     "node": ">=24"
   },
-  "main": "index.js",
   "scripts": {
-    "build": "npx rimraf dist && tsc && gulp build:icons",
+		"clean": "rimraf dist",
+		"build": "npm run clean && tsc && gulp build:icons",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
-    "lint": "npm run lint:n8n && eslint nodes credentials package.json",
-    "lint:n8n": "eslint nodes credentials",
-    "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+		"lint": "npm run lint:n8n && eslint nodes credentials package.json",
+		"lint:n8n": "eslint nodes credentials",
+		"lint:ci": "npm run lint -- --max-warnings=0",
+		"lintfix": "npm run lint -- --fix",
+		"prepublishOnly": "npm run build && npm run lint -- -c .eslintrc.prepublish.js nodes credentials package.json"
   },
   "files": [
     "dist"
@@ -49,6 +50,7 @@
     "gulp": "^5.0.0",
     "n8n-node-dev": "^1.119.1",
     "prettier": "^3.5.3",
+    "rimraf": "^6.1.2",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {

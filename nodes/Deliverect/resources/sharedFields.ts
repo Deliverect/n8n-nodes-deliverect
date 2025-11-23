@@ -1,54 +1,41 @@
 import type { INodeProperties } from 'n8n-workflow';
+import type { DeliverectOperationOption, DeliverectResourceName } from '../helpers';
 
-const accountOperations: string[] = [
-	'getStores',
-	'setOutOfStock',
-	'productSync',
-	'getProductCategories',
-	'getStoreOpeningHours',
-	'requestProductSync',
-	'getProductsMarkedOutOfStock',
-	'updateProductAvailabilityByPlu',
-	'markProductsOutOfStockByTag',
-] as const;
+type RequirementFlag = 'needsAccount' | 'needsLocation';
 
-const locationOperations: string[] = [
-	'productSync',
-	'getOutOfStock',
-	'getProductCategories',
-	'setStoreStatus',
-	'setOutOfStock',
-	'requestProductSync',
-	'markProductsOutOfStockByTag',
-	'updateProductAvailabilityByPlu',
-	'updateStoreStatusPrepTime',
-] as const;
+const operationsForFlag = (
+	options: DeliverectOperationOption[],
+	flag: RequirementFlag,
+): string[] =>
+	options.filter((option) => option[flag]).map((option) => option.value as string);
 
-export const accountField: INodeProperties = {
-	displayName: 'Account ID',
-	name: 'account',
+const createScopedField = (
+	label: string,
+	name: string,
+	resource: DeliverectResourceName,
+	options: DeliverectOperationOption[],
+	flag: RequirementFlag,
+): INodeProperties => ({
+	displayName: label,
+	name,
 	type: 'string',
 	required: true,
 	default: '',
 	displayOptions: {
 		show: {
-			resource: ['posAPI', 'storeAPI'],
-			operation: accountOperations,
+			resource: [resource],
+			operation: operationsForFlag(options, flag),
 		},
 	},
-};
+});
 
-export const locationField: INodeProperties = {
-	displayName: 'Location ID',
-	name: 'location',
-	type: 'string',
-	required: true,
-	default: '',
-	displayOptions: {
-		show: {
-			resource: ['posAPI', 'storeAPI'],
-			operation: locationOperations,
-		},
-	},
-};
+export const buildAccountField = (
+	resource: DeliverectResourceName,
+	options: DeliverectOperationOption[],
+): INodeProperties => createScopedField('Account ID', 'account', resource, options, 'needsAccount');
 
+export const buildLocationField = (
+	resource: DeliverectResourceName,
+	options: DeliverectOperationOption[],
+): INodeProperties =>
+	createScopedField('Location ID', 'location', resource, options, 'needsLocation');

@@ -6,6 +6,7 @@ import { kdsResource } from './resources/kds';
 import { posResource } from './resources/pos';
 import { restResource } from './resources/rest';
 import { storeResource } from './resources/store';
+import { userResource } from './resources/user';
 
 export class Deliverect implements INodeType {
 	description: INodeTypeDescription = {
@@ -60,6 +61,10 @@ export class Deliverect implements INodeType {
 						name: 'Store API',
 						value: 'storeAPI',
 					},
+					{
+						name: 'User API',
+						value: 'userAPI',
+					},
 				],
 				default: 'storeAPI',
 			},
@@ -70,6 +75,7 @@ export class Deliverect implements INodeType {
 				commerceResource,
 				restResource,
 				kdsResource,
+				userResource,
 			]),
 		],
 	};
