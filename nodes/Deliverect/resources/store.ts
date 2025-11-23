@@ -404,7 +404,7 @@ const storeSpecificFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['storeAPI'],
-				operation: ['updateStoreStatusPrepTime'],
+				operation: ['setStoreStatus', 'updateStoreStatusPrepTime'],
 			},
 		},
 	},
