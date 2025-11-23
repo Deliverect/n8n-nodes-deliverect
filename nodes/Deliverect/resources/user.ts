@@ -22,6 +22,6 @@ const userOperationOptions: DeliverectOperationOption[] = [
 
 export const userResource: DeliverectResourceModule = {
 	resource: 'userAPI',
-	operations: createOperationsProperty('userAPI', userOperationOptions, 'getOwnAccount'),
+	operations: createOperationsProperty('userAPI', userOperationOptions, 'getMyProfile'),
 };
 
