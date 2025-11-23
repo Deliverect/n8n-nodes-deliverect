@@ -1,5 +1,6 @@
 import type { INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow';
 import { deliverectRequestDefaults, flattenResourceModules } from './helpers';
+import { accountResource } from './resources/account';
 import { channelResource } from './resources/channel';
 import { commerceResource } from './resources/commerce';
 import { kdsResource } from './resources/kds';
@@ -38,6 +39,10 @@ export class Deliverect implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
+						name: 'Account API',
+						value: 'accountAPI',
+					},
+					{
 						name: 'Channel API',
 						value: 'channelAPI',
 					},
@@ -69,6 +74,7 @@ export class Deliverect implements INodeType {
 				default: 'storeAPI',
 			},
 			...flattenResourceModules([
+				accountResource,
 				storeResource,
 				channelResource,
 				posResource,

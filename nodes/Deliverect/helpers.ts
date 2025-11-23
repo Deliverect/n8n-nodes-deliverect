@@ -1,6 +1,7 @@
 import type { IDataObject, INodeProperties, INodePropertyOptions } from 'n8n-workflow';
 
 export type DeliverectResourceName =
+	| 'accountAPI'
 	| 'channelAPI'
 	| 'commerceAPI'
 	| 'kdsAPI'

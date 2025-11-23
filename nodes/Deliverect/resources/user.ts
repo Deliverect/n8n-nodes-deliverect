@@ -6,10 +6,11 @@ import {
 
 const userOperationOptions: DeliverectOperationOption[] = [
 	{
-		name: 'Get My Account',
-		value: 'getOwnAccount',
-		action: 'Get my account',
-		description: 'Retrieve the account associated with the authenticated API user',
+		name: 'Get My Profile',
+		value: 'getMyProfile',
+		action: 'Get my profile',
+		description:
+			'Retrieve the authenticated user profile',
 		routing: {
 			request: {
 				method: 'GET',
