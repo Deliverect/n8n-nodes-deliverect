@@ -9,18 +9,15 @@ on:
 jobs:
   build-and-lint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: ["20", "22", "24"]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: "24"
           cache: npm
 
       - name: Cache TypeScript build info
@@ -28,7 +25,7 @@ jobs:
         with:
           path: |
             tsconfig.tsbuildinfo
-          key: ${{ runner.os }}-tsbuild-${{ matrix.node-version }}-${{ hashFiles('tsconfig.json', 'nodes/**/*.ts', 'credentials/**/*.ts') }}
+          key: ${{ runner.os }}-tsbuild-node24-${{ hashFiles('tsconfig.json', 'nodes/**/*.ts', 'credentials/**/*.ts') }}
 
       - name: Install dependencies
         run: npm ci

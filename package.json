@@ -19,15 +19,15 @@
     "node": ">=24"
   },
   "scripts": {
-		"clean": "rimraf dist",
-		"build": "npm run clean && tsc && gulp build:icons",
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc && gulp build:icons",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
-		"lint": "npm run lint:n8n && eslint nodes credentials package.json",
-		"lint:n8n": "eslint nodes credentials",
-		"lint:ci": "npm run lint -- --max-warnings=0",
-		"lintfix": "npm run lint -- --fix",
-		"prepublishOnly": "npm run build && npm run lint -- -c .eslintrc.prepublish.js nodes credentials package.json"
+    "lint": "npm run lint:n8n && eslint nodes credentials package.json",
+    "lint:n8n": "eslint nodes credentials",
+    "lint:ci": "npm run lint -- --max-warnings=0",
+    "lintfix": "npm run lint -- --fix",
+    "prepublishOnly": "npm run build && npm run lint -- -c .eslintrc.prepublish.js nodes credentials package.json"
   },
   "files": [
     "dist"
