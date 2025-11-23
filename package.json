@@ -23,11 +23,14 @@
     "build": "npm run clean && tsc && gulp build:icons",
     "dev": "tsc --watch",
     "format": "prettier nodes credentials --write",
-    "lint": "npm run lint:n8n && eslint nodes credentials package.json",
+    "lint": "npm run lint:n8n && npm run lint:repo",
     "lint:n8n": "eslint nodes credentials",
-    "lint:ci": "npm run lint -- --max-warnings=0",
-    "lintfix": "npm run lint -- --fix",
-    "prepublishOnly": "npm run build && npm run lint -- -c .eslintrc.prepublish.js nodes credentials package.json"
+    "lint:repo": "eslint nodes credentials package.json",
+    "lint:repo:ci": "eslint --max-warnings=0 nodes credentials package.json",
+    "lint:repo:fix": "eslint --fix nodes credentials package.json",
+    "lint:ci": "npm run lint:n8n && npm run lint:repo:ci",
+    "lintfix": "npm run lint:n8n && npm run lint:repo:fix",
+    "prepublishOnly": "npm run build && npm run lint:n8n && eslint -c .eslintrc.prepublish.js nodes credentials package.json"
   },
   "files": [
     "dist"
