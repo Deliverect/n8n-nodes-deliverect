@@ -89,7 +89,7 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/locations/holidays',
+								url: '=/location/{{$parameter.location}}/holidays',
 							},
 						},
 					},
@@ -292,6 +292,7 @@ export class Deliverect implements INodeType {
 							'getProductCategories',
 							'setStoreStatus',
 							'setOutOfStock',
+							'getStoreHolidays',
 						],
 					},
 				},
