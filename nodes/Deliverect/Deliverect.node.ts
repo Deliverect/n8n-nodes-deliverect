@@ -298,6 +298,20 @@ export class Deliverect implements INodeType {
 				},
 			},
 			{
+				displayName: 'Product PLUs',
+				name: 'products',
+				type: 'json',
+				default: '[]',
+				required: true,
+				description: 'JSON array of PLU identifiers to snooze',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setOutOfStock'],
+					},
+				},
+			},
+			{
 				displayName: 'Holidays',
 				name: 'holidays',
 				type: 'json',
