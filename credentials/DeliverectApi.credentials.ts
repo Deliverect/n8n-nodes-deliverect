@@ -12,10 +12,8 @@ export class DeliverectApi implements ICredentialType {
 	name = 'deliverectApi';
 	displayName = 'Deliverect API';
 	icon: Icon = 'file:../nodes/Deliverect/deliverect.svg';
-	// Uses the link to this tutorial as an example
-	// Replace with your own docs links when building your own nodes
 	documentationUrl =
-		'https://docs.n8n.io/integrations/creating-nodes/build/declarative-style-node/';
+		'https://developers.deliverect.com/reference/machine-2-machine-access-token';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Session Token',
