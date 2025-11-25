@@ -369,7 +369,7 @@ export class Deliverect implements INodeType {
 				type: 'json',
 				default: '[]',
 				required: true,
-				description: 'JSON array of PLU identifiers to snooze',
+				description: 'JSON array of PLU identifiers to snooze. For example: ["PLU123", "PLU456"]',
 				displayOptions: {
 					show: {
 						resource: ['storeAPI'],
