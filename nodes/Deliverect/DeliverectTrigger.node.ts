@@ -89,7 +89,7 @@ export class DeliverectTrigger implements INodeType {
 		if (verifySignature) {
 			// Verify HMAC signature when enabled
 			const credentials = await this.getCredentials('deliverectApi');
-			const webhookSecret = (credentials.webhookSecret as string) || '';
+			const webhookSecret = credentials.webhookSecret as string;
 			if (!webhookSecret) {
 				throw new NodeOperationError(
 					this.getNode(),
