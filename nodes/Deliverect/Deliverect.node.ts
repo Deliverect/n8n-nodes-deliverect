@@ -339,6 +339,7 @@ export class Deliverect implements INodeType {
 				type: 'number',
 				typeOptions: {
 					minValue: 0,
+					maxValue: 60,
 				},
 				default: null,
 				description: 'Optional override for the preparation time applied to the entire location',
@@ -386,14 +387,16 @@ export class Deliverect implements INodeType {
 			"id": "65***********aa56be7b63",
 			"holidays": [
 				{
-					"startTime": "2023-12-24T15:00:00Z",
-					"endTime": "2023-12-25T02:00:00Z"
+					"startTime": "2023-12-24T15:00:00",
+					"endTime": "2023-12-25T02:00:00"
 				}
 			]
 		}
 	]
 }`,
 				required: true,
+				description:
+					'JSON body describing holidays to send to Deliverect. Times must be expressed in the store’s local time zone (no trailing Z).',
 				displayOptions: {
 					// the resources and operations to display this element with
 					show: {
