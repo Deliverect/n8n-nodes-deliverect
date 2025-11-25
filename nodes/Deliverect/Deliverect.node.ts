@@ -168,8 +168,15 @@ export class Deliverect implements INodeType {
 								url: '=/updateStoreStatus/{{$parameter.location}}',
 								body: {
 									isActive: '={{$parameter.isActive}}',
-									channelLinks:
-										'={{$parameter.channelLinks && $parameter.channelLinks.length ? $parameter.channelLinks : undefined}}',
+									channelLinks: `={{ (() => {
+										if ($parameter.channelLinks === undefined || $parameter.channelLinks === null) {
+											return undefined;
+										}
+										const value = Array.isArray($parameter.channelLinks)
+											? $parameter.channelLinks
+											: jsonParse($parameter.channelLinks);
+										return Array.isArray(value) && value.length ? value : undefined;
+									})() }}`,
 									prepTime:
 										'={{$parameter.prepTime !== null && $parameter.prepTime !== undefined ? $parameter.prepTime : undefined}}',
 									disableAt:
