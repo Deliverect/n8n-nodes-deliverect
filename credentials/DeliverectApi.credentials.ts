@@ -77,7 +77,7 @@ export class DeliverectApi implements ICredentialType {
 			},
 			default: '',
 			description:
-				'The webhook secret provided by Deliverect for HMAC signature verification of incoming webhooks. This is different from the Client Secret used for M2M authentication. Required for webhook security.',
+				'The webhook secret provided by Deliverect for HMAC signature verification of incoming webhooks. Leave empty to skip HMAC verification.',
 		},
 	];
 
