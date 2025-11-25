@@ -89,7 +89,7 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/locations/holidays',
+								url: '=/location/{{$parameter.location}}/holidays',
 							},
 						},
 					},
@@ -168,8 +168,23 @@ export class Deliverect implements INodeType {
 								url: '=/updateStoreStatus/{{$parameter.location}}',
 								body: {
 									isActive: '={{$parameter.isActive}}',
-									// channelLinks:
-									'=disableAt':
+									channelLinks: `={{ (() => {
+										if ($parameter.channelLinks === undefined || $parameter.channelLinks === null) {
+											return undefined;
+										}
+										let value = $parameter.channelLinks;
+										if (!Array.isArray(value)) {
+											try {
+												value = JSON.parse(value);
+											} catch (error) {
+												return undefined;
+											}
+										}
+										return Array.isArray(value) && value.length ? value : undefined;
+									})() }}`,
+									prepTime:
+										'={{$parameter.prepTime !== null && $parameter.prepTime !== undefined ? $parameter.prepTime : undefined}}',
+									disableAt:
 										'={{$parameter.disableAt !== "" && $parameter.disableAt !== undefined ? $parameter.disableAt : undefined}}',
 								},
 							},
@@ -292,7 +307,78 @@ export class Deliverect implements INodeType {
 							'getProductCategories',
 							'setStoreStatus',
 							'setOutOfStock',
+							'getStoreHolidays',
 						],
+					},
+				},
+			},
+			{
+				displayName: 'Is Active',
+				name: 'isActive',
+				type: 'boolean',
+				default: true,
+				description: 'Whether the store (or targeted channels) should be available online',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setStoreStatus'],
+					},
+				},
+			},
+			{
+				displayName: 'Channel Links',
+				name: 'channelLinks',
+				type: 'json',
+				default: '[]',
+				description: 'Optional array of channel link IDs to update; leave as empty array (`[]`) to target the whole location. Example: ["channelId1", "channelId2"].',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setStoreStatus'],
+					},
+				},
+			},
+			{
+				displayName: 'Preparation Time (Minutes)',
+				name: 'prepTime',
+				type: 'number',
+				typeOptions: {
+					minValue: 0,
+					maxValue: 60,
+				},
+				default: null,
+				description: 'Optional override for the preparation time applied to the entire location',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setStoreStatus'],
+					},
+				},
+			},
+			{
+				displayName: 'Auto Reactivate At',
+				name: 'disableAt',
+				type: 'string',
+				default: '',
+				description: 'Optional ISO 8601 timestamp after which Deliverect reactivates the store automatically',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setStoreStatus'],
+					},
+				},
+			},
+			{
+				displayName: 'Product PLUs',
+				name: 'products',
+				type: 'json',
+				default: '[]',
+				required: true,
+				description: 'JSON array of PLU identifiers to snooze. For example: ["PLU123", "PLU456"].',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setOutOfStock'],
 					},
 				},
 			},
@@ -300,12 +386,67 @@ export class Deliverect implements INodeType {
 				displayName: 'Holidays',
 				name: 'holidays',
 				type: 'json',
-				default: `{"locations": [{"id": "65***********aa56be7b63", "holidays": []}]}`,
+				default: `{
+	"locations": [
+		{
+			"id": "65***********aa56be7b63",
+			"holidays": [
+				{
+					"startTime": "2023-12-24T15:00:00",
+					"endTime": "2023-12-25T02:00:00"
+				}
+			]
+		}
+	]
+}`,
+				required: true,
+				description:
+					'JSON body describing holidays to send to Deliverect. Times must be expressed in the store’s local time zone (no trailing Z).',
 				displayOptions: {
 					// the resources and operations to display this element with
 					show: {
 						resource: ['storeAPI'],
 						operation: ['setStoreHolidays'],
+					},
+				},
+			},
+			{
+				displayName: 'Opening Hours Payload',
+				name: 'openingHours',
+				type: 'json',
+				default: `{
+	"locations": [
+		{
+			"id": "65***********aa56be7b63",
+			"triggerUpdate": false,
+			"openingHours": [
+				{
+					"dayOfWeek": 1,
+					"startTime": "10:00",
+					"endTime": "22:00"
+				}
+			],
+			"channels": [
+				{
+					"id": "62***********fd1f",
+					"openingHours": [
+						{
+							"dayOfWeek": 1,
+							"startTime": "08:00",
+							"endTime": "20:00"
+						}
+					]
+				}
+			]
+		}
+	]
+}`,
+				required: true,
+				description: 'JSON body describing the opening hours to send to Deliverect',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setStoreOpeningHours'],
 					},
 				},
 			},
