@@ -172,9 +172,14 @@ export class Deliverect implements INodeType {
 										if ($parameter.channelLinks === undefined || $parameter.channelLinks === null) {
 											return undefined;
 										}
-										const value = Array.isArray($parameter.channelLinks)
-											? $parameter.channelLinks
-											: jsonParse($parameter.channelLinks);
+										let value = $parameter.channelLinks;
+										if (!Array.isArray(value)) {
+											try {
+												value = JSON.parse(value);
+											} catch (error) {
+												return undefined;
+											}
+										}
 										return Array.isArray(value) && value.length ? value : undefined;
 									})() }}`,
 									prepTime:
@@ -325,7 +330,7 @@ export class Deliverect implements INodeType {
 				name: 'channelLinks',
 				type: 'json',
 				default: '[]',
-				description: 'Optional array of channel link IDs to update; leave as empty array (`[]`) to target the whole location. Example: ["channelId1", "channelId2"]',
+				description: 'Optional array of channel link IDs to update; leave as empty array (`[]`) to target the whole location. Example: ["channelId1", "channelId2"].',
 				displayOptions: {
 					show: {
 						resource: ['storeAPI'],
@@ -369,7 +374,7 @@ export class Deliverect implements INodeType {
 				type: 'json',
 				default: '[]',
 				required: true,
-				description: 'JSON array of PLU identifiers to snooze. For example: ["PLU123", "PLU456"]',
+				description: 'JSON array of PLU identifiers to snooze. For example: ["PLU123", "PLU456"].',
 				displayOptions: {
 					show: {
 						resource: ['storeAPI'],
