@@ -171,7 +171,7 @@ export class Deliverect implements INodeType {
 									channelLinks:
 										'={{$parameter.channelLinks && $parameter.channelLinks.length ? $parameter.channelLinks : undefined}}',
 									prepTime:
-										'={{$parameter.prepTime !== "" && $parameter.prepTime !== undefined ? $parameter.prepTime : undefined}}',
+										'={{$parameter.prepTime !== null && $parameter.prepTime !== undefined ? $parameter.prepTime : undefined}}',
 									disableAt:
 										'={{$parameter.disableAt !== "" && $parameter.disableAt !== undefined ? $parameter.disableAt : undefined}}',
 								},
@@ -333,7 +333,7 @@ export class Deliverect implements INodeType {
 				typeOptions: {
 					minValue: 0,
 				},
-				default: 0,
+				default: null,
 				description: 'Optional override for the preparation time applied to the entire location',
 				displayOptions: {
 					show: {
