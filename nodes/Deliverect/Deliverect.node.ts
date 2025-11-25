@@ -315,12 +315,64 @@ export class Deliverect implements INodeType {
 				displayName: 'Holidays',
 				name: 'holidays',
 				type: 'json',
-				default: `{"locations": [{"id": "65***********aa56be7b63", "holidays": []}]}`,
+				default: `{
+	"locations": [
+		{
+			"id": "65***********aa56be7b63",
+			"holidays": [
+				{
+					"startTime": "2023-12-24T15:00:00Z",
+					"endTime": "2023-12-25T02:00:00Z"
+				}
+			]
+		}
+	]
+}`,
 				displayOptions: {
 					// the resources and operations to display this element with
 					show: {
 						resource: ['storeAPI'],
 						operation: ['setStoreHolidays'],
+					},
+				},
+			},
+			{
+				displayName: 'Opening Hours Payload',
+				name: 'openingHours',
+				type: 'json',
+				default: `{
+	"locations": [
+		{
+			"id": "65***********aa56be7b63",
+			"triggerUpdate": false,
+			"openingHours": [
+				{
+					"dayOfWeek": 1,
+					"startTime": "10:00",
+					"endTime": "22:00"
+				}
+			],
+			"channels": [
+				{
+					"id": "62***********fd1f",
+					"openingHours": [
+						{
+							"dayOfWeek": 1,
+							"startTime": "08:00",
+							"endTime": "20:00"
+						}
+					]
+				}
+			]
+		}
+	]
+}`,
+				required: true,
+				description: 'JSON body describing the opening hours to send to Deliverect',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setStoreOpeningHours'],
 					},
 				},
 			},
