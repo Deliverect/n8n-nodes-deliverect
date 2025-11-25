@@ -325,7 +325,7 @@ export class Deliverect implements INodeType {
 				name: 'channelLinks',
 				type: 'json',
 				default: '[]',
-				description: 'Optional array of channel link IDs to update; leave empty to target the whole location',
+				description: 'Optional array of channel link IDs to update; leave as empty array (`[]`) to target the whole location. Example: ["channelId1", "channelId2"]',
 				displayOptions: {
 					show: {
 						resource: ['storeAPI'],
