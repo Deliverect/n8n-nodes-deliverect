@@ -168,8 +168,11 @@ export class Deliverect implements INodeType {
 								url: '=/updateStoreStatus/{{$parameter.location}}',
 								body: {
 									isActive: '={{$parameter.isActive}}',
-									// channelLinks:
-									'=disableAt':
+									channelLinks:
+										'={{$parameter.channelLinks && $parameter.channelLinks.length ? $parameter.channelLinks : undefined}}',
+									prepTime:
+										'={{$parameter.prepTime !== "" && $parameter.prepTime !== undefined ? $parameter.prepTime : undefined}}',
+									disableAt:
 										'={{$parameter.disableAt !== "" && $parameter.disableAt !== undefined ? $parameter.disableAt : undefined}}',
 								},
 							},
@@ -298,6 +301,61 @@ export class Deliverect implements INodeType {
 				},
 			},
 			{
+				displayName: 'Is Active',
+				name: 'isActive',
+				type: 'boolean',
+				default: true,
+				description: 'Whether the store (or targeted channels) should be available online',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setStoreStatus'],
+					},
+				},
+			},
+			{
+				displayName: 'Channel Links',
+				name: 'channelLinks',
+				type: 'json',
+				default: '[]',
+				description: 'Optional array of channel link IDs to update; leave empty to target the whole location',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setStoreStatus'],
+					},
+				},
+			},
+			{
+				displayName: 'Preparation Time (Minutes)',
+				name: 'prepTime',
+				type: 'number',
+				typeOptions: {
+					minValue: 0,
+				},
+				default: 0,
+				description: 'Optional override for the preparation time applied to the entire location',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setStoreStatus'],
+					},
+				},
+			},
+			{
+				displayName: 'Auto Reactivate At',
+				name: 'disableAt',
+				type: 'string',
+				default: '',
+				description: 'Optional ISO 8601 timestamp after which Deliverect reactivates the store automatically',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setStoreStatus'],
+					},
+				},
+			},
+			{
 				displayName: 'Product PLUs',
 				name: 'products',
 				type: 'json',
@@ -328,6 +386,7 @@ export class Deliverect implements INodeType {
 		}
 	]
 }`,
+				required: true,
 				displayOptions: {
 					// the resources and operations to display this element with
 					show: {
