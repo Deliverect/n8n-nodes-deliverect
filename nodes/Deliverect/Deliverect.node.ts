@@ -141,7 +141,20 @@ export class Deliverect implements INodeType {
 							request: {
 								method: 'POST',
 								url: '=/locations/holidays',
-								body: '={{ $parameter.holidays }}',
+								body: `={{ (() => {
+									const payload = $parameter.holidays;
+									if (payload === undefined || payload === null) {
+										return payload;
+									}
+									if (typeof payload === 'string') {
+										try {
+											return JSON.parse(payload);
+										} catch (error) {
+											throw new Error('Invalid JSON provided for Holidays payload');
+										}
+									}
+									return payload;
+								})() }}`,
 							},
 						},
 					},
@@ -153,7 +166,20 @@ export class Deliverect implements INodeType {
 							request: {
 								method: 'POST',
 								url: '=/locations/openingHours',
-								body: '={{ $parameter.openingHours }}',
+								body: `={{ (() => {
+									const payload = $parameter.openingHours;
+									if (payload === undefined || payload === null) {
+										return payload;
+									}
+									if (typeof payload === 'string') {
+										try {
+											return JSON.parse(payload);
+										} catch (error) {
+											throw new Error('Invalid JSON provided for Opening Hours payload');
+										}
+									}
+									return payload;
+								})() }}`,
 							},
 						},
 					},
