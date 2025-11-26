@@ -79,14 +79,19 @@ export class DeliverectTrigger implements INodeType {
 		const req = this.getRequestObject();
 		const body = req.body as IDataObject;
 		const headers = req.headers;
-		const verifySignature = this.getNodeParameter('verifySignature', 0) as boolean;
+		const verifySignatureRaw = this.getNodeParameter('verifySignature', 0) as boolean | string | number | undefined;
+		// Boolean parameters can occasionally be serialized as strings when coming from older workflows
+		const shouldVerify =
+			typeof verifySignatureRaw === 'string'
+				? ['true', '1'].includes(verifySignatureRaw.trim().toLowerCase())
+				: Boolean(verifySignatureRaw);
 
 		// Validate that we received data
 		if (!body) {
 			throw new NodeOperationError(this.getNode(), 'No data received in webhook request');
 		}
 
-		if (verifySignature) {
+		if (shouldVerify) {
 			// Verify HMAC signature when enabled
 			const credentials = await this.getCredentials('deliverectApi');
 			const webhookSecret = credentials.webhookSecret as string;
