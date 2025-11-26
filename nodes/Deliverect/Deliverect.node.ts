@@ -93,7 +93,7 @@ export class Deliverect implements INodeType {
 								url: '=/products',
 								qs: {
 									where:
-										'= {{ JSON.stringify($parameter.storeProductsLocation ? { account: $parameter.account, location: $parameter.storeProductsLocation } : { account: $parameter.account }) }}',
+										'={{ JSON.stringify($parameter.storeProductsLocation ? { account: $parameter.account, location: $parameter.storeProductsLocation } : { account: $parameter.account }) }}',
 								},
 							},
 						},
