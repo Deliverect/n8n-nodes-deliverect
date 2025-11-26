@@ -404,8 +404,7 @@ export class Deliverect implements INodeType {
 				type: 'dateTime',
 				required: true,
 				default: '',
-				description:
-					'ISO 8601 UTC timestamp indicating when products become available again; must be in the future when snoozing, in the past to un-snooze.',
+				description: 'ISO 8601 UTC timestamp indicating when products become available again; must be in the future when snoozing, in the past to un-snooze',
 				displayOptions: {
 					show: {
 						resource: ['storeAPI'],
