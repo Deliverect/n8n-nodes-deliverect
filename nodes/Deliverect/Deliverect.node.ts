@@ -128,9 +128,9 @@ export class Deliverect implements INodeType {
 								body: {
 									account: '={{$parameter.account}}',
 									location: '={{$parameter.location}}',
-									plus: '={{ $parameter.products }}',
-									snoozeStart: '={{ $parameter.snoozeStart }}',
-									snoozeEnd: '={{ $parameter.snoozeEnd }}',
+									plus: '={{$parameter.products}}',
+									snoozeStart: '={{$parameter.snoozeStart}}',
+									snoozeEnd: '={{$parameter.snoozeEnd}}',
 								},
 							},
 						},
