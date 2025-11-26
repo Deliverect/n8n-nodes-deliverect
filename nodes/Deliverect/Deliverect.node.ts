@@ -93,7 +93,7 @@ export class Deliverect implements INodeType {
 								url: '=/products',
 								qs: {
 									where:
-										'={{ JSON.stringify($parameter.storeProductsLocation ? { account: $parameter.account, location: $parameter.storeProductsLocation } : { account: $parameter.account }) }}',
+										'={{ JSON.stringify($parameter.locationId ? { account: $parameter.account, location: $parameter.locationId } : { account: $parameter.account }) }}',
 								},
 							},
 						},
@@ -311,7 +311,7 @@ export class Deliverect implements INodeType {
 			},
 			{
 				displayName: 'Filter by Location ID',
-				name: 'storeProductsLocation',
+				name: 'locationId',
 				type: 'string',
 				default: '',
 				description: 'Optional location ID to scope products to a single store',
