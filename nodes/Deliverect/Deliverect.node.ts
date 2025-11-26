@@ -143,7 +143,7 @@ export class Deliverect implements INodeType {
 										const firstEntry = pageItems[0]?.json as IDataObject;
 										const meta = firstEntry?._meta as IDataObject | undefined;
 										const normalizedItems: IDataObject[] = Array.isArray(firstEntry?._items)
-											? ((firstEntry?._items as IDataObject[]) ?? [])
+											? (firstEntry?._items as IDataObject[])
 											: pageItems.map((entry) => entry.json ?? {});
 
 										aggregatedItems.push(
