@@ -234,7 +234,7 @@ export class Deliverect implements INodeType {
 						name: 'Request Product Sync',
 						value: 'productSync',
 						action: 'Request product sync',
-						description: 'Trigger Deliverect to sync products for a location',
+						description: 'Trigger Deliverect to sync products for a POS on a specific location',
 						routing: {
 							request: {
 								method: 'POST',
