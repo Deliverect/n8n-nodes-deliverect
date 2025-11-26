@@ -83,7 +83,7 @@ export class DeliverectTrigger implements INodeType {
 		// Boolean parameters can occasionally be serialized as strings when coming from older workflows
 		const shouldVerify =
 			typeof verifySignatureRaw === 'string'
-				? verifySignatureRaw.toLowerCase() === 'true'
+				? ['true', '1'].includes(verifySignatureRaw.trim().toLowerCase())
 				: Boolean(verifySignatureRaw);
 
 		// Validate that we received data
