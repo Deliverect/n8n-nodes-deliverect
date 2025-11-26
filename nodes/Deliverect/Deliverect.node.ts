@@ -1,4 +1,11 @@
-import type { INodeType, INodeTypeDescription } from 'n8n-workflow';
+import type {
+	DeclarativeRestApiSettings,
+	IDataObject,
+	IExecutePaginationFunctions,
+	INodeExecutionData,
+	INodeType,
+	INodeTypeDescription,
+} from 'n8n-workflow';
 
 export class Deliverect implements INodeType {
 	description: INodeTypeDescription = {
@@ -94,6 +101,99 @@ export class Deliverect implements INodeType {
 								qs: {
 									where:
 										'={{ JSON.stringify($parameter.locationId ? { account: $parameter.account, location: $parameter.locationId } : { account: $parameter.account }) }}',
+								},
+							},
+							operations: {
+								pagination: async function (
+									this: IExecutePaginationFunctions,
+									requestOptions: DeclarativeRestApiSettings.ResultOptions
+								): Promise<INodeExecutionData[]> {
+									const clonedRequest: DeclarativeRestApiSettings.ResultOptions = {
+										...requestOptions,
+										options: {
+											...requestOptions.options,
+											qs: {
+												...(requestOptions.options.qs ?? {}),
+											},
+										},
+									};
+
+									const qs = (clonedRequest.options.qs ??= {}) as IDataObject;
+									const maxResultsPerPage = 500;
+									const aggregatedItems: INodeExecutionData[] = [];
+
+									let cursorParameter: string | undefined = 'new';
+									let nextPage = 1;
+									let totalAvailable: number | undefined;
+
+									while (true) {
+										qs.max_results = maxResultsPerPage;
+										qs.cursor = cursorParameter;
+										qs.page = nextPage;
+
+										const pageItems = await this.makeRoutingRequest({
+											...clonedRequest,
+											paginate: false,
+										});
+
+										if (!pageItems.length) {
+											break;
+										}
+
+										const firstEntry = pageItems[0]?.json as IDataObject;
+										const meta = (firstEntry?._meta as IDataObject | undefined) ?? undefined;
+										const normalizedItems: IDataObject[] = Array.isArray(firstEntry?._items)
+											? ((firstEntry?._items as IDataObject[]) ?? [])
+											: pageItems.map((entry) => entry.json ?? {});
+
+										aggregatedItems.push(
+											...normalizedItems.map((item) => ({
+												json: item,
+											}))
+										);
+
+										const returnedCount = normalizedItems.length;
+										const pageSize = typeof meta?.max_results === 'number' ? meta.max_results : maxResultsPerPage;
+										const currentPage = typeof meta?.page === 'number' ? meta.page : nextPage;
+										const cursorFromMeta =
+											typeof meta?.cursor === 'string' && meta.cursor.length ? meta.cursor : undefined;
+
+										if (typeof meta?.total === 'number') {
+											totalAvailable = meta.total;
+										}
+
+										if (cursorFromMeta) {
+											cursorParameter = cursorFromMeta;
+										} else if (cursorParameter === 'new') {
+											cursorParameter = undefined;
+										}
+
+										if (!returnedCount) {
+											break;
+										}
+
+										if (!cursorParameter) {
+											break;
+										}
+
+										const fetchedSoFar =
+											typeof totalAvailable === 'number' && typeof pageSize === 'number'
+												? currentPage * pageSize
+												: undefined;
+
+										if (
+											(typeof fetchedSoFar === 'number' &&
+												typeof totalAvailable === 'number' &&
+												fetchedSoFar >= totalAvailable) ||
+											(returnedCount < maxResultsPerPage && typeof totalAvailable !== 'number')
+										) {
+											break;
+										}
+
+										nextPage = currentPage + 1;
+									}
+
+									return aggregatedItems;
 								},
 							},
 						},
