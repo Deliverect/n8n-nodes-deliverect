@@ -83,6 +83,22 @@ export class Deliverect implements INodeType {
 						},
 					},
 					{
+						name: 'Get Products for Account',
+						value: 'getProductsForAccount',
+						action: 'Get products for account',
+						description: 'Retrieve products for an entire account or a single location',
+						routing: {
+							request: {
+								method: 'GET',
+								url: '=/products',
+								qs: {
+									where:
+										'= {{ JSON.stringify($parameter.storeProductsLocation ? { account: $parameter.account, location: $parameter.storeProductsLocation } : { account: $parameter.account }) }}',
+								},
+							},
+						},
+					},
+					{
 						name: 'Get Store Holidays',
 						value: 'getStoreHolidays',
 						action: 'Get store holidays',
@@ -288,7 +304,21 @@ export class Deliverect implements INodeType {
 							'productSync',
 							'getProductCategories',
 							'getStoreOpeningHours',
+							'getProductsForAccount',
 						],
+					},
+				},
+			},
+			{
+				displayName: 'Filter by Location ID',
+				name: 'storeProductsLocation',
+				type: 'string',
+				default: '',
+				description: 'Optional location ID to scope products to a single store',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['getProductsForAccount'],
 					},
 				},
 			},
