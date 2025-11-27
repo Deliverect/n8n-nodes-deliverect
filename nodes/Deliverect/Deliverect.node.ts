@@ -1,5 +1,42 @@
 import type { INodeType, INodeTypeDescription } from 'n8n-workflow';
 
+function buildJsonParsingExpression({
+	paramName,
+	fieldLabel,
+	allowUndefined = false,
+	trimEmptyStringToUndefined = false,
+	postProcess,
+}: {
+	paramName: string;
+	fieldLabel: string;
+	allowUndefined?: boolean;
+	trimEmptyStringToUndefined?: boolean;
+	postProcess?: string;
+}) {
+	const undefinedReturn = allowUndefined ? 'return undefined;' : 'return payload;';
+	const emptyStringCondition = trimEmptyStringToUndefined
+		? " || (typeof payload === 'string' && payload.trim() === '')"
+		: '';
+	const postProcessBlock = postProcess ?? 'return result;';
+
+	return `={{ (() => {
+	const payload = $parameter.${paramName};
+	if (payload === undefined || payload === null${emptyStringCondition}) {
+		${undefinedReturn}
+	}
+	let result = payload;
+	if (typeof result === 'string') {
+		try {
+			result = JSON.parse(result);
+		} catch (error) {
+			const message = error && error.message ? error.message : error;
+			throw new Error(\`Invalid JSON provided for ${fieldLabel} payload: \${message}\`);
+		}
+	}
+	${postProcessBlock}
+})() }}`;
+}
+
 export class Deliverect implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Deliverect',
@@ -143,7 +180,10 @@ export class Deliverect implements INodeType {
 							request: {
 								method: 'POST',
 								url: '=/locations/holidays',
-								body: '={{ $parameter.holidays }}',
+								body: buildJsonParsingExpression({
+									paramName: 'holidays',
+									fieldLabel: 'Holidays',
+								}),
 							},
 						},
 					},
@@ -155,7 +195,10 @@ export class Deliverect implements INodeType {
 							request: {
 								method: 'POST',
 								url: '=/locations/openingHours',
-								body: '={{ $parameter.openingHours }}',
+								body: buildJsonParsingExpression({
+									paramName: 'openingHours',
+									fieldLabel: 'Opening Hours',
+								}),
 							},
 						},
 					},
@@ -170,20 +213,16 @@ export class Deliverect implements INodeType {
 								url: '=/updateStoreStatus/{{$parameter.location}}',
 								body: {
 									isActive: '={{$parameter.isActive}}',
-									channelLinks: `={{ (() => {
-										if ($parameter.channelLinks === undefined || $parameter.channelLinks === null) {
-											return undefined;
-										}
-										let value = $parameter.channelLinks;
-										if (!Array.isArray(value)) {
-											try {
-												value = JSON.parse(value);
-											} catch (error) {
-												return undefined;
-											}
-										}
-										return Array.isArray(value) && value.length ? value : undefined;
-									})() }}`,
+									channelLinks: buildJsonParsingExpression({
+										paramName: 'channelLinks',
+										fieldLabel: 'Channel Links',
+										allowUndefined: true,
+										trimEmptyStringToUndefined: true,
+										postProcess: `if (!Array.isArray(result)) {
+	return undefined;
+}
+return result.length ? result : undefined;`,
+									}),
 									prepTime:
 										'={{$parameter.prepTime !== null && $parameter.prepTime !== undefined ? $parameter.prepTime : undefined}}',
 									disableAt:
