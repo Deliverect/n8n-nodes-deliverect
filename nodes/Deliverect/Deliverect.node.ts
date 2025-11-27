@@ -128,7 +128,9 @@ export class Deliverect implements INodeType {
 								body: {
 									account: '={{$parameter.account}}',
 									location: '={{$parameter.location}}',
-									plus: '={{ $parameter.products }}',
+									plus: '={{$parameter.products}}',
+									snoozeStart: '={{$parameter.snoozeStart}}',
+									snoozeEnd: '={{$parameter.snoozeEnd}}',
 								},
 							},
 						},
@@ -374,6 +376,34 @@ export class Deliverect implements INodeType {
 				default: '[]',
 				required: true,
 				description: 'JSON array of PLU identifiers to snooze. For example: ["PLU123", "PLU456"].',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setOutOfStock'],
+					},
+				},
+			},
+			{
+				displayName: 'Snooze Start',
+				name: 'snoozeStart',
+				type: 'dateTime',
+				required: true,
+				default: '',
+				description: 'ISO 8601 UTC timestamp indicating when snoozing starts (typically now)',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI'],
+						operation: ['setOutOfStock'],
+					},
+				},
+			},
+			{
+				displayName: 'Snooze End',
+				name: 'snoozeEnd',
+				type: 'dateTime',
+				required: true,
+				default: '',
+				description: 'ISO 8601 UTC timestamp indicating when products become available again; must be in the future when snoozing, in the past to un-snooze',
 				displayOptions: {
 					show: {
 						resource: ['storeAPI'],
