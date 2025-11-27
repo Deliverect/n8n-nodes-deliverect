@@ -231,14 +231,14 @@ export class Deliverect implements INodeType {
 				},
 				options: [
 					{
-						name: 'Sync POS Products',
+						name: 'Request Product Sync',
 						value: 'productSync',
-						action: 'Sync POS products',
-						description: 'Sync products for a location',
+						action: 'Request product sync',
+						description: 'Trigger Deliverect to sync products for a POS on a specific location',
 						routing: {
 							request: {
 								method: 'POST',
-								url: '/productAndCategories',
+								url: '=/v2/locations/{{$parameter.location}}/syncProducts',
 							},
 						},
 					},
@@ -285,7 +285,6 @@ export class Deliverect implements INodeType {
 						operation: [
 							'getStores',
 							'setOutOfStock',
-							'productSync',
 							'getProductCategories',
 							'getStoreOpeningHours',
 						],
