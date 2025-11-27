@@ -30,7 +30,7 @@ function buildJsonParsingExpression({
 			result = JSON.parse(result);
 		} catch (error) {
 			const message = error && error.message ? error.message : error;
-			throw new Error(`Invalid JSON provided for ${fieldLabel} payload: ${message}`);
+			throw new Error(\`Invalid JSON provided for ${fieldLabel} payload: \${message}\`);
 		}
 	}
 	${postProcessBlock}
