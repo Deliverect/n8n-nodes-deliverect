@@ -165,7 +165,16 @@ export class Deliverect implements INodeType {
 								body: {
 									account: '={{$parameter.account}}',
 									location: '={{$parameter.location}}',
-									plus: '={{$parameter.products}}',
+									plus: buildJsonParsingExpression({
+										paramName: 'products',
+										fieldLabel: 'Product PLUs',
+										postProcess: `if (!Array.isArray(result)) {
+	return (() => {
+		throw new Error('Product PLUs payload must be an array');
+	})();
+}
+return result;`,
+									}),
 									snoozeStart: '={{$parameter.snoozeStart}}',
 									snoozeEnd: '={{$parameter.snoozeEnd}}',
 								},
