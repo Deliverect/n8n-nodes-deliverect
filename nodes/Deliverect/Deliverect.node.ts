@@ -217,9 +217,9 @@ export class Deliverect implements INodeType {
 										allowUndefined: true,
 										trimEmptyStringToUndefined: true,
 										postProcess: `if (!Array.isArray(result)) {
-		return undefined;
-	}
-	return result.length ? result : undefined;`,
+	return undefined;
+}
+return result.length ? result : undefined;`,
 									}),
 									prepTime:
 										'={{$parameter.prepTime !== null && $parameter.prepTime !== undefined ? $parameter.prepTime : undefined}}',
