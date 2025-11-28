@@ -301,9 +301,7 @@ export class Deliverect implements INodeType {
 										paramName: 'products',
 										fieldLabel: 'Product PLUs',
 										postProcess: `if (!Array.isArray(result)) {
-	return (() => {
-		throw new Error('Product PLUs payload must be an array');
-	})();
+	throw new Error('Product PLUs payload must be an array');
 }
 return result;`,
 									}),
