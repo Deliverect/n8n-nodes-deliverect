@@ -45,6 +45,10 @@ function buildJsonParsingExpression({
 })() }}`;
 }
 
+function buildProjectionExpression(fields: Record<string, number | object>) {
+	return `={{ $parameter.fetchFullPayload ? undefined : JSON.stringify(${JSON.stringify(fields)}) }}`;
+}
+
 export class Deliverect implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Deliverect',
@@ -126,8 +130,16 @@ export class Deliverect implements INodeType {
 								url: '=/channelDisabledProducts',
 								qs: {
 									where: '={{ JSON.stringify({ location: $parameter.location }) }}',
-									projection:
-										'={{ $parameter.fetchFullPayload ? undefined : JSON.stringify({ _id: 1, location: 1, channelLink: 1, plus: 1, channel: 1, disabledUntil: 1, createdAt: 1, updatedAt: 1 }) }}',
+									projection: buildProjectionExpression({
+										_id: 1,
+										location: 1,
+										channelLink: 1,
+										plus: 1,
+										channel: 1,
+										disabledUntil: 1,
+										createdAt: 1,
+										updatedAt: 1,
+									}),
 								},
 							},
 						},
@@ -144,8 +156,16 @@ export class Deliverect implements INodeType {
 								qs: {
 									where:
 										'={{ JSON.stringify($parameter.locationId ? { account: $parameter.account, location: $parameter.locationId } : { account: $parameter.account }) }}',
-									projection:
-										'={{ $parameter.fetchFullPayload ? undefined : JSON.stringify({ _id: 1, account: 1, location: 1, name: 1, plu: 1, channelLinks: 1, tags: 1, updatedAt: 1 }) }}',
+									projection: buildProjectionExpression({
+										_id: 1,
+										account: 1,
+										location: 1,
+										name: 1,
+										plu: 1,
+										channelLinks: 1,
+										tags: 1,
+										updatedAt: 1,
+									}),
 								},
 							},
 							operations: {
@@ -250,12 +270,16 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-										url: '=/locations/holidays',
-										qs: {
-											where: '={{ JSON.stringify({ location: $parameter.location }) }}',
-									projection:
-										'={{ $parameter.fetchFullPayload ? undefined : JSON.stringify({ id: 1, name: 1, holidays: 1, timezone: 1 }) }}',
-										},
+								url: '=/locations/holidays',
+								qs: {
+									where: '={{ JSON.stringify({ location: $parameter.location }) }}',
+									projection: buildProjectionExpression({
+										id: 1,
+										name: 1,
+										holidays: 1,
+										timezone: 1,
+									}),
+								},
 							},
 						},
 					},
@@ -268,8 +292,13 @@ export class Deliverect implements INodeType {
 								method: 'GET',
 								url: '=/account/{{$parameter.account}}/openingHours',
 								qs: {
-									projection:
-										'={{ $parameter.fetchFullPayload ? undefined : JSON.stringify({ account: 1, location: 1, timezone: 1, days: 1, openingHours: 1 }) }}',
+									projection: buildProjectionExpression({
+										account: 1,
+										location: 1,
+										timezone: 1,
+										days: 1,
+										openingHours: 1,
+									}),
 								},
 							},
 						},
@@ -285,8 +314,16 @@ export class Deliverect implements INodeType {
 								url: '=/locations',
 								qs: {
 									where: '={{ JSON.stringify({ account: $parameter.account }) }}',
-									projection:
-										'={{ $parameter.fetchFullPayload ? undefined : JSON.stringify({ _id: 1, account: 1, name: 1, posLocationId: 1, channelLinks: 1, timezone: 1, isActive: 1, updatedAt: 1 }) }}',
+									projection: buildProjectionExpression({
+										_id: 1,
+										account: 1,
+										name: 1,
+										posLocationId: 1,
+										channelLinks: 1,
+										timezone: 1,
+										isActive: 1,
+										updatedAt: 1,
+									}),
 								},
 							},
 						},
@@ -438,8 +475,12 @@ return result.length ? result : undefined;`,
 								method: 'GET',
 								url: '/allAllergens',
 								qs: {
-									projection:
-										'={{ $parameter.fetchFullPayload ? undefined : JSON.stringify({ _id: 1, name: 1, tags: 1, updatedAt: 1 }) }}',
+									projection: buildProjectionExpression({
+										_id: 1,
+										name: 1,
+										tags: 1,
+										updatedAt: 1,
+									}),
 								},
 							},
 						},
@@ -455,8 +496,13 @@ return result.length ? result : undefined;`,
 								url: '/productCategories',
 								qs: {
 									where: '={{ JSON.stringify({ account: $parameter.account }) }}',
-									projection:
-										'={{ $parameter.fetchFullPayload ? undefined : JSON.stringify({ _id: 1, name: 1, parent: 1, account: 1, products: { _id: 1, name: 1 } }) }}',
+									projection: buildProjectionExpression({
+										_id: 1,
+										name: 1,
+										parent: 1,
+										account: 1,
+										products: { _id: 1, name: 1 },
+									}),
 								},
 							},
 						},
