@@ -26,7 +26,9 @@
     "lint": "npm run lint:n8n && eslint nodes credentials package.json",
     "lint:n8n": "eslint nodes credentials",
     "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "files": [
     "dist"
@@ -49,7 +51,8 @@
     "gulp": "^5.0.0",
     "n8n-node-dev": "^1.119.1",
     "prettier": "^3.5.3",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^3.2.0"
   },
   "peerDependencies": {
     "n8n-workflow": "*"
