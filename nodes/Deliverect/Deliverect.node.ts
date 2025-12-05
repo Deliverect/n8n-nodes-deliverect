@@ -270,16 +270,7 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/locations/holidays',
-								qs: {
-									where: '={{ JSON.stringify({ location: $parameter.location }) }}',
-									projection: buildProjectionExpression({
-										id: 1,
-										name: 1,
-										holidays: 1,
-										timezone: 1,
-									}),
-								},
+								url: '=/location/{{$parameter.location}}/holidays',
 							},
 						},
 					},
