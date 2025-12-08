@@ -5,6 +5,7 @@ import type {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
+	NodeConnectionType,
 } from 'n8n-workflow';
 
 function buildJsonParsingExpression({
@@ -44,6 +45,10 @@ function buildJsonParsingExpression({
 })() }}`;
 }
 
+function buildProjectionExpression(fields: Record<string, number | object>) {
+	return `={{ $parameter.fetchFullPayload ? undefined : JSON.stringify(${JSON.stringify(fields)}) }}`;
+}
+
 export class Deliverect implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Deliverect',
@@ -56,8 +61,8 @@ export class Deliverect implements INodeType {
 		defaults: {
 			name: 'Deliverect',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: ['main'] as NodeConnectionType[],
+		outputs: ['main'] as NodeConnectionType[],
 		credentials: [
 			{
 				name: 'deliverectApi',
@@ -122,7 +127,20 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/channelDisabledProducts?where={"location":"{{$parameter.location}}"}',
+								url: '=/channelDisabledProducts',
+								qs: {
+									where: '={{ JSON.stringify({ location: $parameter.location }) }}',
+									projection: buildProjectionExpression({
+										_id: 1,
+										location: 1,
+										channelLink: 1,
+										plus: 1,
+										channel: 1,
+										disabledUntil: 1,
+										createdAt: 1,
+										updatedAt: 1,
+									}),
+								},
 							},
 						},
 					},
@@ -138,6 +156,16 @@ export class Deliverect implements INodeType {
 								qs: {
 									where:
 										'={{ JSON.stringify($parameter.locationId ? { account: $parameter.account, location: $parameter.locationId } : { account: $parameter.account }) }}',
+									projection: buildProjectionExpression({
+										_id: 1,
+										account: 1,
+										location: 1,
+										name: 1,
+										plu: 1,
+										channelLinks: 1,
+										tags: 1,
+										updatedAt: 1,
+									}),
 								},
 							},
 							operations: {
@@ -254,6 +282,15 @@ export class Deliverect implements INodeType {
 							request: {
 								method: 'GET',
 								url: '=/account/{{$parameter.account}}/openingHours',
+								qs: {
+									projection: buildProjectionExpression({
+										account: 1,
+										location: 1,
+										timezone: 1,
+										days: 1,
+										openingHours: 1,
+									}),
+								},
 							},
 						},
 					},
@@ -265,7 +302,20 @@ export class Deliverect implements INodeType {
 						routing: {
 							request: {
 								method: 'GET',
-								url: '=/locations?where={"account":"{{$parameter.account}}"}',
+								url: '=/locations',
+								qs: {
+									where: '={{ JSON.stringify({ account: $parameter.account }) }}',
+									projection: buildProjectionExpression({
+										_id: 1,
+										account: 1,
+										name: 1,
+										posLocationId: 1,
+										channelLinks: 1,
+										timezone: 1,
+										isActive: 1,
+										updatedAt: 1,
+									}),
+								},
 							},
 						},
 					},
@@ -285,9 +335,7 @@ export class Deliverect implements INodeType {
 										paramName: 'products',
 										fieldLabel: 'Product PLUs',
 										postProcess: `if (!Array.isArray(result)) {
-	return (() => {
-		throw new Error('Product PLUs payload must be an array');
-	})();
+	throw new Error('Product PLUs payload must be an array');
 }
 return result;`,
 									}),
@@ -417,6 +465,14 @@ return result.length ? result : undefined;`,
 							request: {
 								method: 'GET',
 								url: '/allAllergens',
+								qs: {
+									projection: buildProjectionExpression({
+										_id: 1,
+										name: 1,
+										tags: 1,
+										updatedAt: 1,
+									}),
+								},
 							},
 						},
 					},
@@ -431,6 +487,13 @@ return result.length ? result : undefined;`,
 								url: '/productCategories',
 								qs: {
 									where: '={{ JSON.stringify({ account: $parameter.account }) }}',
+									projection: buildProjectionExpression({
+										_id: 1,
+										name: 1,
+										parent: 1,
+										account: 1,
+										products: { _id: 1, name: 1 },
+									}),
 								},
 							},
 						},
@@ -439,6 +502,26 @@ return result.length ? result : undefined;`,
 				default: 'productSync',
 			},
 			// Optional/additional fields will go here
+			{
+				displayName: 'Fetch Full Payload',
+				name: 'fetchFullPayload',
+				type: 'boolean',
+				default: false,
+				description: 'Whether to disable projection and return full API responses',
+				displayOptions: {
+					show: {
+						resource: ['storeAPI', 'posAPI'],
+						operation: [
+							'getOutOfStock',
+							'getProductsForAccount',
+							'getStoreOpeningHours',
+							'getStores',
+							'getAllAllergens',
+							'getProductCategories',
+						],
+					},
+				},
+			},
 			{
 				displayName: 'Account ID',
 				name: 'account',
@@ -483,7 +566,6 @@ return result.length ? result : undefined;`,
 						operation: [
 							'productSync',
 							'getOutOfStock',
-							'getProductCategories',
 							'setStoreStatus',
 							'setOutOfStock',
 							'getStoreHolidays',
