@@ -318,8 +318,8 @@ const storeSpecificFields: INodeProperties[] = [
 			"id": "65***********aa56be7b63",
 			"holidays": [
 				{
-					"startTime": "2023-12-24T15:00:00",
-					"endTime": "2023-12-25T02:00:00"
+					"startTime": "2025-12-24T15:00:00",
+					"endTime": "2025-12-25T02:00:00"
 				}
 			]
 		}
