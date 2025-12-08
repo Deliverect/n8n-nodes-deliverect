@@ -4,7 +4,6 @@ import {
 	type DeliverectOperationOption,
 	type DeliverectResourceModule,
 } from '../helpers';
-import { accountField, fetchFullPayloadField, locationField } from './sharedFields';
 
 const posOperationOptions: DeliverectOperationOption[] = [
 	{
@@ -66,5 +65,5 @@ const posOperationOptions: DeliverectOperationOption[] = [
 export const posResource: DeliverectResourceModule = {
 	resource: 'posAPI',
 	operations: createOperationsProperty('posAPI', posOperationOptions, 'productSync'),
-	fields: [fetchFullPayloadField, accountField, locationField],
+	fields: [],
 };

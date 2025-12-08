@@ -7,12 +7,6 @@ import {
 	type DeliverectOperationOption,
 	type DeliverectResourceModule,
 } from '../helpers';
-import {
-	accountField,
-	fetchFullPayloadField,
-	locationField,
-	locationIdField,
-} from './sharedFields';
 
 const storeOperationOptions: DeliverectOperationOption[] = [
 	{
@@ -386,5 +380,5 @@ const storeSpecificFields: INodeProperties[] = [
 export const storeResource: DeliverectResourceModule = {
 	resource: 'storeAPI',
 	operations: createOperationsProperty('storeAPI', storeOperationOptions, 'getStores'),
-	fields: [fetchFullPayloadField, accountField, locationIdField, locationField, ...storeSpecificFields],
+	fields: storeSpecificFields,
 };

@@ -5,6 +5,12 @@ import { commerceResource } from './resources/commerce';
 import { kdsResource } from './resources/kds';
 import { posResource } from './resources/pos';
 import { restResource } from './resources/rest';
+import {
+	accountField,
+	fetchFullPayloadField,
+	locationField,
+	locationIdField,
+} from './resources/sharedFields';
 import { storeResource } from './resources/store';
 
 export class Deliverect implements INodeType {
@@ -71,6 +77,11 @@ export class Deliverect implements INodeType {
 				restResource,
 				kdsResource,
 			]),
+			// Shared fields (included once, apply to multiple resources via displayOptions)
+			fetchFullPayloadField,
+			accountField,
+			locationIdField,
+			locationField,
 		],
 	};
 }
