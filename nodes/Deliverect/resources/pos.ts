@@ -53,9 +53,9 @@ const posOperationOptions: DeliverectOperationOption[] = [
 	{
 		name: 'Insert/Update Products',
 		value: 'insertUpdateProducts',
-		action: 'Insert update products',
+		action: 'Insert or update products',
 		description:
-			'Create, update, or delete products and categories for a location. Products not included in the payload will be deleted unless forceUpdate is disabled.',
+			'Create, update, or delete products and categories for a location. Products not included in the payload will be deleted. Use forceUpdate to control the 30% deletion protection.',
 		routing: {
 			request: {
 				method: 'POST',
@@ -70,8 +70,12 @@ const posOperationOptions: DeliverectOperationOption[] = [
 					postProcess: `if (typeof result !== 'object' || result === null || Array.isArray(result)) {
 	throw new Error('Products payload must be a JSON object containing accountId, locationId, and products array');
 }
-if (!result.accountId || !result.locationId) {
-	throw new Error('Products payload must include accountId and locationId');
+if (!result.accountId || typeof result.accountId !== 'string' || result.accountId.trim() === '' ||
+    !result.locationId || typeof result.locationId !== 'string' || result.locationId.trim() === '') {
+	throw new Error('Products payload must include non-empty accountId and locationId');
+}
+if (!Array.isArray(result.products)) {
+	throw new Error('Products payload must include a products array');
 }
 return result;`,
 				}),
@@ -151,9 +155,9 @@ const posSpecificFields: INodeProperties[] = [
 		displayName: 'Force Update',
 		name: 'forceUpdate',
 		type: 'boolean',
-		default: true,
+		default: false,
 		description:
-			'Whether to allow deletion of more than 30% of existing products. When disabled (false), the sync will abort if too many products would be deleted.',
+			'Whether to bypass the 30% deletion protection safeguard. When enabled (true), deletions of >30% of products are allowed. When disabled (false, the default), the sync will abort if too many products would be deleted, providing a safety check against accidental mass deletions.',
 		displayOptions: {
 			show: {
 				resource: ['posAPI'],
