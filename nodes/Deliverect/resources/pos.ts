@@ -51,11 +51,11 @@ const posOperationOptions: DeliverectOperationOption[] = [
 		},
 	},
 	{
-		name: 'Insert/Update Products',
-		value: 'insertUpdateProducts',
-		action: 'Insert or update products',
+		name: 'Sync Product Catalog',
+		value: 'syncProductCatalog',
+		action: 'Sync product catalog',
 		description:
-			'WARNING: Products not included in the payload will be deleted. This operation creates, updates, or deletes products and categories for a location. Products must exist on your POS and are identified by their PLU. Use forceUpdate to control the 30% deletion protection.',
+			'WARNING: This replaces the entire product catalog. Products not included in the payload will be deleted. Products must exist on your POS and are identified by their PLU. Use forceUpdate to control the 30% deletion protection.',
 		routing: {
 			request: {
 				method: 'POST',
@@ -100,7 +100,7 @@ return result;`,
 
 const posSpecificFields: INodeProperties[] = [
 	{
-		displayName: 'Products Payload',
+		displayName: 'Product Catalog Payload',
 		name: 'productsPayload',
 		type: 'json',
 		required: true,
@@ -119,8 +119,8 @@ const posSpecificFields: INodeProperties[] = [
 	"categories": []
 }`,
 		description:
-			'<strong>Warning:</strong> Products omitted from payload will be deleted. Use Preview Sync to test changes first.' +
-			'<br /><br />JSON payload for product sync. Must include <code>accountId</code>, <code>locationId</code>, and a <code>products</code> array. ' +
+			'<strong>Warning:</strong> This is a full catalog sync. Products omitted from this payload will be deleted. Use Preview Sync to test changes first.' +
+			'<br /><br />JSON payload containing your complete product catalog. Must include <code>accountId</code>, <code>locationId</code>, and a <code>products</code> array. ' +
 			'<br /><strong>Product fields:</strong>' +
 			'<ul>' +
 			'<li><code>productType</code>: 1 (product), 2 (modifier), 3 (modifier group), 4 (bundle)</li>' +
@@ -135,7 +135,7 @@ const posSpecificFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['posAPI'],
-				operation: ['insertUpdateProducts'],
+				operation: ['syncProductCatalog'],
 			},
 		},
 	},
@@ -149,7 +149,7 @@ const posSpecificFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['posAPI'],
-				operation: ['insertUpdateProducts'],
+				operation: ['syncProductCatalog'],
 			},
 		},
 	},
@@ -163,7 +163,7 @@ const posSpecificFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['posAPI'],
-				operation: ['insertUpdateProducts'],
+				operation: ['syncProductCatalog'],
 			},
 		},
 	},
@@ -171,6 +171,6 @@ const posSpecificFields: INodeProperties[] = [
 
 export const posResource: DeliverectResourceModule = {
 	resource: 'posAPI',
-	operations: createOperationsProperty('posAPI', posOperationOptions, 'insertUpdateProducts'),
+	operations: createOperationsProperty('posAPI', posOperationOptions, 'syncProductCatalog'),
 	fields: posSpecificFields,
 };
