@@ -271,7 +271,8 @@ const storeSpecificFields: INodeProperties[] = [
 		type: 'json',
 		default: '[]',
 		required: true,
-		description: 'JSON array of PLU identifiers to snooze. For example: ["PLU123", "PLU456"].',
+		description:
+			'JSON array of PLU identifiers to snooze. PLUs must match product identifiers on your POS system. For example: ["PLU123", "PLU456"].',
 		displayOptions: {
 			show: {
 				resource: ['storeAPI'],
