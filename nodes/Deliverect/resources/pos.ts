@@ -55,7 +55,7 @@ const posOperationOptions: DeliverectOperationOption[] = [
 		value: 'syncProductCatalog',
 		action: 'Sync product catalog',
 		description:
-			'WARNING: This replaces the entire product catalog. Products not included in the payload will be deleted. Products must exist on your POS and are identified by their PLU. Use forceUpdate to control the 30% deletion protection.',
+			'WARNING: This replaces the entire product catalog. Products not included in the payload will be deleted. Products must exist on your POS and are identified by their PLU. By default, syncs that would delete more than 30% of products are rejected—enable Force Update to bypass this protection.',
 		routing: {
 			request: {
 				method: 'POST',
