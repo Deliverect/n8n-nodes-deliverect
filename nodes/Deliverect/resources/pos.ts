@@ -55,7 +55,7 @@ const posOperationOptions: DeliverectOperationOption[] = [
 		value: 'insertUpdateProducts',
 		action: 'Insert or update products',
 		description:
-			'WARNING: Products not included in the payload will be deleted. This operation creates, updates, or deletes products and categories for a location. Use forceUpdate to control the 30% deletion protection.',
+			'WARNING: Products not included in the payload will be deleted. This operation creates, updates, or deletes products and categories for a location. Products must exist on your POS and are identified by their PLU. Use forceUpdate to control the 30% deletion protection.',
 		routing: {
 			request: {
 				method: 'POST',
@@ -124,7 +124,7 @@ const posSpecificFields: INodeProperties[] = [
 			'<br /><strong>Product fields:</strong>' +
 			'<ul>' +
 			'<li><code>productType</code>: 1 (product), 2 (modifier), 3 (modifier group), 4 (bundle)</li>' +
-			'<li><code>plu</code>: Unique product identifier</li>' +
+			'<li><code>plu</code>: Unique product identifier (must match the PLU on your POS system)</li>' +
 			'<li><code>name</code>: Product name</li>' +
 			'<li><code>price</code>: Price in cents</li>' +
 			'<li><code>tax</code>: Tax percentage</li>' +
