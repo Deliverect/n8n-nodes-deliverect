@@ -55,7 +55,7 @@ const posOperationOptions: DeliverectOperationOption[] = [
 		value: 'insertUpdateProducts',
 		action: 'Insert or update products',
 		description:
-			'Create, update, or delete products and categories for a location. Products not included in the payload will be deleted. Use forceUpdate to control the 30% deletion protection.',
+			'WARNING: Products not included in the payload will be deleted. This operation creates, updates, or deletes products and categories for a location. Use forceUpdate to control the 30% deletion protection.',
 		routing: {
 			request: {
 				method: 'POST',
@@ -119,7 +119,8 @@ const posSpecificFields: INodeProperties[] = [
 	"categories": []
 }`,
 		description:
-			'JSON payload for product sync. Must include <code>accountId</code>, <code>locationId</code>, and a <code>products</code> array. ' +
+			'<strong>Warning:</strong> Products omitted from payload will be deleted. Use Preview Sync to test changes first.' +
+			'<br /><br />JSON payload for product sync. Must include <code>accountId</code>, <code>locationId</code>, and a <code>products</code> array. ' +
 			'<br /><strong>Product fields:</strong>' +
 			'<ul>' +
 			'<li><code>productType</code>: 1 (product), 2 (modifier), 3 (modifier group), 4 (bundle)</li>' +
@@ -130,8 +131,7 @@ const posSpecificFields: INodeProperties[] = [
 			'<li><code>description</code>: Optional product description</li>' +
 			'<li><code>imageUrl</code>: Optional image URL</li>' +
 			'<li><code>subProducts</code>: Array of PLUs for modifiers/combos</li>' +
-			'</ul>' +
-			'Products omitted from payload will be deleted. Use Preview Sync to test changes first.',
+			'</ul>',
 		displayOptions: {
 			show: {
 				resource: ['posAPI'],
