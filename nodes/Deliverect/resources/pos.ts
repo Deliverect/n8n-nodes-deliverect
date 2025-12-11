@@ -157,7 +157,7 @@ const posSpecificFields: INodeProperties[] = [
 		displayName: 'Force Update',
 		name: 'forceUpdate',
 		type: 'boolean',
-			default: false,
+		default: false,
 		description:
 			'Whether to force the update by bypassing the 30% deletion protection safeguard. When disabled (false, the default), the sync will abort if >30% of products would be deleted. When enabled (true), all deletions are allowed regardless of percentage.',
 		displayOptions: {
