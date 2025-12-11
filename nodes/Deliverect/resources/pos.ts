@@ -66,7 +66,7 @@ const posOperationOptions: DeliverectOperationOption[] = [
 				},
 				body: buildJsonParsingExpression({
 					paramName: 'productsPayload',
-					fieldLabel: 'Products',
+					fieldLabel: 'Product Catalog Payload',
 					postProcess: `if (typeof result !== 'object' || result === null || Array.isArray(result)) {
 	throw new Error('Products payload must be a JSON object containing accountId, locationId, and products array');
 }
