@@ -159,7 +159,7 @@ const posSpecificFields: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		description:
-			'Whether to force the update by bypassing the 30% deletion protection safeguard. When disabled (false, the default), the sync will abort if >30% of products would be deleted. When enabled (true), all deletions are allowed regardless of percentage.',
+			'Whether to force the update by bypassing the 30% deletion protection safeguard. When set to false (the default), the sync will abort if >30% of products would be deleted. When set to true, all deletions are allowed regardless of percentage.',
 		displayOptions: {
 			show: {
 				resource: ['posAPI'],
