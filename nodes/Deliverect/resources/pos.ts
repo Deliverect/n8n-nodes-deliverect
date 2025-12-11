@@ -171,6 +171,6 @@ const posSpecificFields: INodeProperties[] = [
 
 export const posResource: DeliverectResourceModule = {
 	resource: 'posAPI',
-	operations: createOperationsProperty('posAPI', posOperationOptions, 'syncProductCatalog'),
+	operations: createOperationsProperty('posAPI', posOperationOptions, 'productSync'),
 	fields: posSpecificFields,
 };
