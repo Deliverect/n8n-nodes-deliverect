@@ -32,6 +32,9 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 					}),
 				},
 			},
+			operations: {
+				pagination: deliverectPagination,
+			},
 		},
 	},
 	{
@@ -92,6 +95,9 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 					}),
 				},
 			},
+			operations: {
+				pagination: deliverectPagination,
+			},
 		},
 	},
 	{
@@ -116,6 +122,9 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 						updatedAt: 1,
 					}),
 				},
+			},
+			operations: {
+				pagination: deliverectPagination,
 			},
 		},
 	},
