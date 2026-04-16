@@ -130,6 +130,34 @@ export function buildProjectionExpression(fields: Record<string, number | object
 	return `={{ $parameter.fetchFullPayload ? undefined : JSON.stringify(${JSON.stringify(fields)}) }}`;
 }
 
+function extractDeliverectPage(pageItems: INodeExecutionData[]): {
+	meta: IDataObject | undefined;
+	normalizedItems: IDataObject[];
+} {
+	if (!pageItems.length) {
+		return { meta: undefined, normalizedItems: [] };
+	}
+
+	const wrapperEntry = pageItems.find((entry) => {
+		const j = entry.json as IDataObject | undefined;
+		return Boolean(j && Array.isArray(j._items));
+	});
+
+	if (wrapperEntry?.json) {
+		const j = wrapperEntry.json as IDataObject;
+		return {
+			meta: j._meta as IDataObject | undefined,
+			normalizedItems: (j._items as IDataObject[]) ?? [],
+		};
+	}
+
+	const first = pageItems[0]?.json as IDataObject | undefined;
+	return {
+		meta: first?._meta as IDataObject | undefined,
+		normalizedItems: pageItems.map((entry) => entry.json ?? {}),
+	};
+}
+
 export async function deliverectPagination(
 	this: IExecutePaginationFunctions,
 	requestOptions: DeclarativeRestApiSettings.ResultOptions,
@@ -166,11 +194,7 @@ export async function deliverectPagination(
 			break;
 		}
 
-		const firstEntry = pageItems[0]?.json as IDataObject;
-		const meta = firstEntry?._meta as IDataObject | undefined;
-		const normalizedItems: IDataObject[] = Array.isArray(firstEntry?._items)
-			? (firstEntry?._items as IDataObject[])
-			: pageItems.map((entry) => entry.json ?? {});
+		const { meta, normalizedItems } = extractDeliverectPage(pageItems);
 
 		aggregatedItems.push(
 			...normalizedItems.map((item) => ({
@@ -211,7 +235,7 @@ export async function deliverectPagination(
 			(typeof fetchedSoFar === 'number' &&
 				typeof totalAvailable === 'number' &&
 				fetchedSoFar >= totalAvailable) ||
-			(returnedCount < maxResultsPerPage && typeof totalAvailable !== 'number')
+			(returnedCount < pageSize && typeof totalAvailable !== 'number')
 		) {
 			break;
 		}
@@ -221,3 +245,11 @@ export async function deliverectPagination(
 
 	return aggregatedItems;
 }
+
+/** Spread into routing alongside `request`. Sets `send.paginate` so n8n runs `operations.pagination`. */
+export const deliverectPaginatedRouting = {
+	send: { paginate: true },
+	operations: {
+		pagination: deliverectPagination,
+	},
+};
