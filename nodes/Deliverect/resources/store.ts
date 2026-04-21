@@ -3,7 +3,7 @@ import {
 	buildJsonParsingExpression,
 	buildProjectionExpression,
 	createOperationsProperty,
-	deliverectPagination,
+	deliverectPaginatedRouting,
 	type DeliverectOperationOption,
 	type DeliverectResourceModule,
 } from '../helpers';
@@ -32,9 +32,7 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 					}),
 				},
 			},
-			operations: {
-				pagination: deliverectPagination,
-			},
+			...deliverectPaginatedRouting,
 		},
 	},
 	{
@@ -61,9 +59,7 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 					}),
 				},
 			},
-			operations: {
-				pagination: deliverectPagination,
-			},
+			...deliverectPaginatedRouting,
 		},
 	},
 	{
@@ -95,9 +91,7 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 					}),
 				},
 			},
-			operations: {
-				pagination: deliverectPagination,
-			},
+			...deliverectPaginatedRouting,
 		},
 	},
 	{
@@ -123,9 +117,7 @@ const storeOperationOptions: DeliverectOperationOption[] = [
 					}),
 				},
 			},
-			operations: {
-				pagination: deliverectPagination,
-			},
+			...deliverectPaginatedRouting,
 		},
 	},
 	{
