@@ -18,6 +18,18 @@ const channelOperationOptions: DeliverectOperationOption[] = [
 			},
 		},
 	},
+	{
+		name: 'Get Store Status',
+		value: 'getStoreStatus',
+		action: 'Get store status',
+		description: 'Get the status of a store (channel link)',
+		routing: {
+			request: {
+				method: 'GET',
+				url: '=/channelLinks/{{$parameter.channelLink}}',
+			},
+		},
+	},
 ];
 
 const channelFields: INodeProperties[] = [
@@ -31,7 +43,7 @@ const channelFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['channelAPI'],
-				operation: ['createOrder'],
+				operation: ['createOrder', 'getStoreStatus'],
 			},
 		},
 	},
